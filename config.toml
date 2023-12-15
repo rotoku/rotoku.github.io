@@ -1,0 +1,187 @@
+baseURL="https://rotoku.github.io/"
+languageCode="pt-br"
+title="Kumabe's GitHub Pages"
+theme=["docsy"]
+
+# Language settings
+contentDir = "content/pt-br"
+defaultContentLanguage = "pt-br"
+defaultContentLanguageInSubdir = false
+# Useful when translating.
+enableMissingTranslationPlaceholders = true
+
+enableRobotsTXT = true
+
+# Will give values to .Lastmod etc.
+enableGitInfo = true
+
+# Comment out to enable taxonomies in Docsy
+# disableKinds = ["taxonomy", "taxonomyTerm"]
+
+# You can add your own taxonomies
+[taxonomies]
+tag = "tags"
+category = "categories"
+
+[languages]
+[languages.pt-br]
+title="Kumabe's GitHub Pages"
+languageName="Português"
+# weight used for sorting
+weight=1
+
+# emoji
+enableEmoji=true
+
+rss_sections = ["blog"]
+
+
+# Highlighting config
+pygmentsCodeFences = true
+pygmentsUseClasses = false
+# Use the new Chroma Go highlighter in Hugo.
+pygmentsUseClassic = false
+#pygmentsOptions = "linenos=table"
+# See https://help.farbox.com/pygments.html
+pygmentsStyle = "tango"
+
+[imaging]
+resampleFilter = "CatmullRom"
+quality = 75
+anchor = "smart"
+
+staticDir = ["static"]
+
+[params]
+copyright = "Kumabe"
+privacy_policy = "https://policies.google.com/privacy"
+
+# Menu title if your navbar has a versions selector to access old versions of your site.
+# This menu appears only if you have at least one [params.versions] set.
+version_menu = "Releases"
+
+# Flag used in the "version-banner" partial to decide whether to display a
+# banner on every page indicating that this is an archived version of the docs.
+# Set this flag to "true" if you want to display the banner.
+archived_version = false
+
+# Enable syntax highlighting and copy buttons on code blocks with Prism
+prism_syntax_highlighting = false
+
+# User interface configuration
+[params.ui]
+# Enable to show the side bar menu in its compact state.
+sidebar_menu_compact = false
+#  Set to true to disable breadcrumb navigation.
+breadcrumb_disable = false
+#  Set to true to hide the sidebar search box (the top nav search box will still be displayed if search is enabled)
+sidebar_search_disable = false
+#  Set to false if you don't want to display a logo (/assets/icons/logo.svg) in the top nav bar
+navbar_logo = false
+# Set to true to disable the About link in the site footer
+footer_about_disable = true
+# dropmenu
+sidebar_menu_foldable = true
+
+[params.ui.readingtime]
+enable = true
+
+# Parâmetros de feedback
+[params.ui.feedback]
+enable = true
+
+# mermaid
+[params.mermaid]
+enable = true
+
+[[menu.main]]
+    name = "Programação"
+    weight = 10
+    url = "/programacao"
+    pre = "<i class='fas fa-laptop-code'></i>"
+[[menu.main]]
+    name = "Front-End"
+    weight = 20
+    url = "/front-end"
+    pre = "<i class='fas fa-code'></i>"
+[[menu.main]]
+    name = "Data Science"
+    weight = 30
+    url = "/data-science"
+    pre = "<i class='fas fa-atom'></i>"
+[[menu.main]]
+    name = "DevOps"
+    weight = 40
+    url = "/devops"
+    pre = "<i class='fas fa-wrench'></i>"    
+[[menu.main]]
+    name = "UX & Design"
+    weight = 50
+    url = "/ux-and-design"
+    pre = "<i class='fas fa-swatchbook'></i>"
+[[menu.main]]
+    name = "Mobile"
+    weight = 60
+    url = "/mobile"
+    pre = "<i class='fas fa-mobile'></i>"
+[[menu.main]]
+    name = "Inovação & Gestão"
+    weight = 70
+    url = "/inovacao-and-gestao"
+    pre = "<i class='fas fa-tasks'></i>"
+[[menu.main]]
+    name = "Cloud Computing"
+    weight = 80
+    url = "/cloud-computing"
+    pre = "<i class='fas fa-cloud'></i>"
+    post = "<span class='alert'>New!</span>"
+
+[params.links]
+# End user relevant links. These will show up on left side of footer and in the community page if you have one.
+[[params.links.user]]
+  name = "User mailing list"
+  url = "https://example.org/mail"
+  icon = "fa fa-envelope"
+  desc = "Discussion and help from your fellow users"
+[[params.links.user]]
+  name ="Twitter"
+  url = "https://twitter.com/rtkumabe"
+  icon = "fab fa-twitter"
+  desc = "Follow us on Twitter to get the latest news!"
+[[params.links.user]]
+  name = "Stack Overflow"
+  url = "https://example.org/stack"
+  icon = "fab fa-stack-overflow"
+  desc = "Practical questions and curated answers"
+# Developer relevant links. These will show up on right side of footer and in the community page if you have one.
+[[params.links.developer]]
+  name = "GitHub"
+  url = "https://github.com/rotoku"
+  icon = "fab fa-github"
+  desc = "Development takes place here!"
+[[params.links.developer]]
+  name = "Slack"
+  url = "https://example.org/slack"
+  icon = "fab fa-slack"
+  desc = "Chat with other project developers"
+[[params.links.developer]]
+  name = "Developer mailing list"
+  url = "https://example.org/mail"
+  icon = "fa fa-envelope"
+  desc = "Discuss development issues around the project"
+
+
+# hugo module configuration
+
+[module]
+  # uncomment line below for temporary local development of module
+  # replacements = "github.com/google/docsy -> ../../docsy"
+  [module.hugoVersion]
+    extended = true
+    min = "0.75.0"
+  [[module.imports]]
+    path = "github.com/google/docsy"
+    disable = false
+  [[module.imports]]
+    path = "github.com/google/docsy/dependencies"
+    disable = false    
