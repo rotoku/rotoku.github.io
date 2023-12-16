@@ -1,5 +1,12 @@
+# Hugo
 /public
-resources/
-node_modules/
-package-lock.json
-.hugo_build.lock
+/resources/_gen/
+hugo_stats.json
+
+# generic
+.DS_Store
+notes*
+
+# node
+**/node_modules/
+
