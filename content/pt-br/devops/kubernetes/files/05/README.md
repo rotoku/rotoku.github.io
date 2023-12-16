@@ -79,24 +79,23 @@ aws ec2 describe-security-groups --group-ids $K8S_WORKER
 
 
 ubuntu@ec2-3-82-204-255.compute-1.amazonaws.com
-sudo su -
-hostnamectl hostname k8s-01
-swapoff -a
+sudo hostnamectl hostname k8s-01
+sudo swapoff -a
 ## cat /etc/fstab (se tiver na listagem o swap significa que o mesmo esta habilitado)
-vim /etc/modules-load.d/k8s.conf
----
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
 overlay
 br_netfilter
----
+EOF
+
 sudo modprobe overlay
 sudo modprobe br_netfilter
 
-sudo vim /etc/sysctl.d/k8s.conf
----
-net.bridge.bridge-nf-call-iptables = 1
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
 net.bridge.bridge-nf-call-ip6tables = 1
-net.ipv4.ip_forward = 1
----
+net.ipv4.ip_forward                 = 1
+EOF
+
 sudo sysctl --system
 
 sudo apt-get update && sudo apt-get install -y apt-transport-https curl
@@ -123,7 +122,7 @@ sudo systemctl enable --now kubelet
 sudo systemctl status containerd
 
 # Caso precise deletar use este comando a seguir: sudo kubeadm reset
-sudo kubeadm init --pod-network-cidr=10.10.0.0/16 --apiserver-advertise-address=172.31.94.253
+sudo kubeadm init --pod-network-cidr=10.10.0.0/16 --apiserver-advertise-address=172.31.37.18
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -131,8 +130,8 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl config view
 
-sudo kubeadm join 172.31.94.253:6443 --token 6ois31.sk2a0ymme076lcn7 \
-        --discovery-token-ca-cert-hash sha256:204a046eca2ff07e83b866bb670aed1c23dc24209913e28b0a700ab8d4464dfc
+sudo kubeadm join 172.31.37.18:6443 --token pg7gcg.3k9cu4jewgt1839g \
+	--discovery-token-ca-cert-hash sha256:c817d1f578b7783bf6e6f43e58d07df7975970d5da302b59cad93bb2ba17270d 
 
 C.N.I (Container Network Interface): é uma especificação e um conjunto de bibliotecas para escrever plugins para configurar interfaces de rede em containers de softwares. Foi proposto pela CoreOS como um padrão comum para permitir a interoperabilidade entre diferentes plataformas de containers (como Kubernetes, Mesos, CloudFoundry e etc) e redes de containers (como Weave, Calico, Cilium e etc)
 
