@@ -743,3 +743,10 @@ deploy o pod
 
 
 **DaemonSet and ReplicaSet** Não é possível utilizar o kubectl create para DaemonSet and ReplicaSet
+
+```
+minikube start --driver=virtualbox --nodes 1 --memory 4096 --cpus 2
+minikube delete --purge
+minikube addons list
+minikube addons enable metrics-server
+```
