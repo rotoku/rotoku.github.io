@@ -750,3 +750,29 @@ minikube delete --purge
 minikube addons list
 minikube addons enable metrics-server
 ```
+
+## Time Saving Aliases for k8s certification exams
+```
+## General Aliases
+alias k="kubectl"
+alias ks="kubectl -n kube-system"
+alias kdesc="kubectl describe"
+
+## Create Resources
+alias kcf="kubectl create -f"
+alias kaf="kubectl apply -f"
+
+## Get Resources
+alias kgn="kubectl get nodes"
+alias kgp="kubectl get pods"
+alias kgpa="kubectl get pods --all-namespaces"
+alias kgs="kubectl get services"
+alias kgd="kubectl get deployments"
+
+## Delete Resources
+alias kd="kubectl delete"
+alias kdp="kubectl delete pods"
+alias kds="kubectl delete services"
+alias kdd="kubectl delete deployments"
+alias kdn="kubectl delete namespaces"
+```
