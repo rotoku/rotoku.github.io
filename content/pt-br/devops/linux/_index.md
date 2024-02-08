@@ -146,3 +146,125 @@ sudo dpkg -l
 or
 apt list
 ```
+
+## Command Line
+```
+# Listar arquivos ocultos
+ls -a
+
+# Listar arquivos backup
+ls -B
+
+# Listar apenas arquivos correntes
+ls -A
+
+# Listar os arquivos identificando os tipos de arquivos
+ls -F
+Pasta/
+executavel*
+linkSimbolico@
+arquivo
+
+# Listagem longa
+ls -l
+
+# Listar com o usuário
+ls -o
+
+# Listar sem o grupo
+ls -G
+
+# Listar com o grupo numerico
+ls -ln
+
+# Ordenação
+ls -f
+
+## Data de criação
+ls -lat
+
+## Data de criação inversa
+ls -latr
+
+
+## listar por extensão
+ls -lhtax
+
+## Diretório do usuário corrente
+cd ~/
+
+## volta para pasta anterior
+cd -
+
+## Diretório atual
+pwd
+
+## Voltar uma estrutura de diretório
+cd ..
+
+## cria um diretório
+mkdir
+
+## cria um diretório recursivo
+mkdir -p /home/rkumabe/emptyDir1/emptyDir2
+
+## Arvore de diretório
+tree 
+tree -a
+
+## remover diretório
+rmdir Pasta1
+
+rmdir -p Pasta1/Pasta1_1/Pasta1_1_1
+
+## Exibindo conteúdo de um arquivo
+cat teste.txt
+cat -n teste.txt
+cat -s teste.txt
+cat -b teste.txt
+cat -e teste.txt
+## tab ^I
+cat -T teste.txt
+
+## cat de forma invertida
+tac teste.txt
+
+
+rm teste.txt
+rm -r dir
+rm -rf dir
+
+## Copia de forma recursiva
+cp -r origin destin
+
+## Copia também arquivos especiais, como por exemplo socket
+cp -R origin destin
+
+## copia somente se os arquivos da origem for mais novo que o do destino
+cp -vru origin destin
+
+## não cópia arquivos que esteja em uma partição diferente
+cp -vrx origin destin
+
+cp -a origin destin = cp -dpR origin destin
+
+mv origin destin
+
+mv -i origin destin
+
+mv -uv origin destin
+```
+
+## Editores
+- nano
+- mcedit (sudo apt install mc -y)
+- vim
+
+## Escrevendo conteúdo como root
+```
+cat <<EOF | sudo tee /var/www/html/index.html
+<h1>Hello World, Kumabe!</h1>
+EOF
+
+echo -e "<h1>Hello World, Kumabe\u0021</h1>" | sudo tee /var/www/html/index.html
+```

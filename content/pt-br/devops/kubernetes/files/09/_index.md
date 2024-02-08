@@ -1,1 +1,5 @@
-# DAY 04
+# DAY 09
+
+## Ingress
+- annotations
+- nginx ingress controller
