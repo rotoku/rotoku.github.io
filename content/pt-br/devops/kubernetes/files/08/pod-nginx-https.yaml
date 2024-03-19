@@ -12,14 +12,11 @@ spec:
     - containerPort: 80
     - containerPort: 443
     volumeMounts:
-    - name: nginx-config-volume
-      mountPath: /etc/nginx
     - name: nginx-secret-volume
-      mountPath: /etc/nginx/ssl
+      mountPath: /etc/nginx/ssl/
+    - name: nginx-config-volume
+      mountPath: /etc/nginx/      
   volumes:
-  - name: nginx-config-volume
-    configMap:
-      name: nginx-config
   - name: nginx-secret-volume      
     secret:
       secretName: nginx-secret
@@ -27,4 +24,7 @@ spec:
         - key: tls.crt
           path: certificado.crt
         - key: tls.key
-          path: chave-privada.key
+          path: chave_privada.key
+  - name: nginx-config-volume
+    configMap:
+      name: nginx-config          

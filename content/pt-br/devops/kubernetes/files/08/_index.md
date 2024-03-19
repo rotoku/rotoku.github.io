@@ -40,7 +40,7 @@ kubectl create secret tls meu-servico-web-tls-secret \
 
 ## ConfigMaps
 ```
-kubectl create configmap nginx-config --from-file nginx.conf
+kubectl create configmap nginx-config --from-file=nginx.conf
 
 kubectl get configmap nginx-config
 
@@ -54,15 +54,20 @@ kubectl get configmap nginx-config -o yaml > nginx-config.yaml
 ## Desafio: Criar um nginx com https
 ```
 cat <<EOF > nginx.conf
-events { }
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
 
 http {
     server {
         listen 80;
-        listen 443 ssl;
-
-        ssl_certificate /etc/nginx/tls/certificado.crt;
-        ssl_certificate_key /etc/nginx/tls/chave_privada.key;
 
         location / {
             return 200 'Olá terraqueos e extraterrestres!\n';

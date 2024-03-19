@@ -4,11 +4,13 @@ linkTitle: "Python"
 weight: 2
 ---
 
----------------
----------------
----------------
-
 # Python
+
+## Multiparadigma
+- procedural
+- orientação a objetos
+- funcional
+
 
 ## Criando ambiente virtual para teste local sem poluir ambiente global
 > Exemplo utilizando Python 3.10.6 

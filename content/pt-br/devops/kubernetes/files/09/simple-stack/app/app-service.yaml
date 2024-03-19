@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: contatos-app
+  labels:
+    app: contatos-app
+spec:
+  selector:
+    app: contatos-app
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      name: tcp-app
+  type: ClusterIP

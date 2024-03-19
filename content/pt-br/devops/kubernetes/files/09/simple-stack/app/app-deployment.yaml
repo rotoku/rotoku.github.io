@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: contatos-app
+  name: contatos-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contatos-app
+  template:
+    metadata:
+      labels:
+        app: contatos-app
+    spec:
+      containers:
+      - image: rotoku/contatos-app:1.0.0
+        name: contatos-app
+        env:
+        - name: DB_URL
+          value: mysql-service
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secrets
+              key: mysql_user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secrets
+              key: mysql_password
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secrets
+              key: mysql_database          
+        ports:
+        - containerPort: 3000
+        imagePullPolicy: Always
