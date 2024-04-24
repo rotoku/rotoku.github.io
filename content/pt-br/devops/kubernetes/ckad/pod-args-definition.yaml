@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: alpine-sleeper
+  labels:
+    app: alpine-sleeper
+spec:
+  containers:
+    - name: alpine-sleeper
+      image: rotoku/alpine-sleeper:latest
+      args: ["10"]

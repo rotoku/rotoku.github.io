@@ -148,6 +148,18 @@
 
 
     - Reporting and logging
+        Você pode acessar o log de auditoria por meio do GitHub.com, do GitHub Enterprise Server ou do GitHub AE para conferir as ações dos últimos 90 dias. 
+        A API GraphQL está disponível para organizações que usam o GitHub Enterprise e pode recuperar informações sobre ações com até 120 dias. Ela monitora:
+        A API REST está disponível para organizações que usam o GitHub Enterprise Cloud e pode recuperar informações sobre ações ocorridas durante um período de até 90 dias. Ela monitora as mesmas ações que a API GraphQL e também os eventos do Git. No entanto, as informações sobre eventos do Git ficam no log por apenas sete dias.        
+
+|Qualificador|Valor de exemplo|
+|---|---|
+|action|team.create|
+|actor|octocat|
+|user|codertocat|
+|org|octo-org|
+|repo|octo-org/documentation|
+|created|2019-06-01|
 
     - Exercise
 
@@ -191,6 +203,46 @@
     - Manage actions and workflows
 
     - Manage runners
+```
+#Download
+## Create a folder
+mkdir actions-runner && cd actions-runner
+
+## Download the latest runner package
+curl -o actions-runner-linux-x64-2.314.1.tar.gz -L https://github.com/actions/runner/releases/download/v2.314.1/actions-runner-linux-x64-2.314.1.tar.gz
+
+## Optional: Validate the hash
+echo "6c726a118bbe02cd32e222f890e1e476567bf299353a96886ba75b423c1137b5  actions-runner-linux-x64-2.314.1.tar.gz" | shasum -a 256 -c
+
+## Extract the installer
+tar xzf ./actions-runner-linux-x64-2.314.1.tar.gz
+
+## Configure
+### Create the runner and start the configuration experience
+./config.sh --url https://github.com/kumabes-org --token 123456789 --labels x64,linux,github-runner
+
+# Last step, run it!
+sudo ./svc.sh install ec2-user
+sudo ./svc.sh start
+sudo ./svc.sh status
+```
+
+Servidores proxy
+Caso precise de um executor auto-hospedado para se comunicar com o GitHub por meio de um servidor proxy, o Enterprise Cloud e o Enterprise Server permitirão que você altere as configurações de proxy usando as seguintes variáveis de ambiente:
+
+Variável de ambiente	Descrição
+https_proxy	URL de proxy para tráfego HTTPS. Também é possível incluir credenciais de autenticação básicas, se necessário. Por exemplo:
+http://proxy.local
+http://192.168.1.1:8080
+http://username:password@proxy.local
+http_proxy	URL de proxy para tráfego HTTP. Também é possível incluir credenciais de autenticação básicas, se necessário. Por exemplo:
+http://proxy.local
+http://192.168.1.1:8080
+http://username:password@proxy.local
+no_proxy	Lista separada por vírgulas de hosts que não devem usar um proxy. Somente os nomes de host são permitidos no no_proxy, você não pode usar endereços IP. Por exemplo:
+example.com
+example.com,myserver.local:443,example.org
+
 
     - Manage encrypted secrets
 
@@ -204,9 +256,18 @@
     - Introduction
 
     - What is GitHub Packages?
+        - npm
+        - NuGet
+        - Maven/Gradle
+        - RubyGems
+        - containers
 
     - Publish to GitHub Packages and GitHub Container Registry
-
+```
+echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+docker tag IMAGE_ID ghcr.io/OWNER/IMAGE_NAME:latest
+docker push ghcr.io/OWNER/IMAGE_NAME:latest
+```
     - Knowledge check
 
     - Exercise - Publish to a GitHub Packages registry

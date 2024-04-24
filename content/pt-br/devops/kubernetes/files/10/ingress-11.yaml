@@ -3,12 +3,21 @@ kind: Ingress
 metadata:
   name: giropops-senhas
   annotations:
+    nginx.ingress.kubernetes.io/limit-rps: "2"
     nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    created-by: "Kumabe"
 spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - giropops-senhas.kumabe.com.br
+    secretName: giropops-senhas-tls
   rules:
-  - http:
+  - host: giropops-senhas.kumabe.com.br
+    http:
       paths:
-      - path: /giropops-senhas
+      - path: /
         pathType: Prefix
         backend:
           service:

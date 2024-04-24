@@ -11,6 +11,22 @@ weight: 10
 
 # Kubernetes
 
+## Kinds
+|kind|version|
+|:---|:---:|
+|Pod|v1|
+|Service|v1|
+|ReplicaSet|apps/v1|
+|Deployment|apps/v1|
+|Namespace|v1|
+|PersistentVolume|v1|
+|PersistentVolumeClaim|v1|
+|StorageClass|storage.k8s.io/v1|
+|StatefullSet|apps/v1|
+|Secret|v1|
+|ConfigMap|v1|
+|Ingress|networking.k8s.io/v1|
+
 ## Entendendo o que são containers e o kubernetes
 ### o que é container?
 Containers são unidades executáveis de software em que o código do aplicativo é empacotado com suas respectivas bibliotecas e dependências, usando métodos comuns para executá-los em qualquer lugar, seja em um computador desktop, na estrutura de TI tradicional ou na cloud.

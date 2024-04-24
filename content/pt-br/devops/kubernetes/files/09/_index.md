@@ -52,7 +52,6 @@ nodes:
     hostPort: 443
     protocol: TCP
 - role: worker
-- role: worker
 - role: worker    
 ```
 
@@ -71,7 +70,31 @@ kubectl wait --namespace ingress-nginx \
   --selector=app.kubernetes.io/component=controller \
   --timeout=90s
 
-kubectl port-forward service/giropops-senhas 5000:5000
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: /foo(/|$)(.*)
+        backend:
+          service:
+            name: foo-service
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: /bar(/|$)(.*)
+        backend:
+          service:
+            name: bar-service
+            port:
+              number: 8080
+
 ```
 
 ```
@@ -84,3 +107,118 @@ kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 
 kubectl get ingress
 kubectl get ingress contatos-app-ingress -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 kubectl get ingress contatos-app-ingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+$ k run nginx --image nginx --port 80
+
+$ k get pods
+NAME                                READY   STATUS    RESTARTS   AGE
+giropops-senhas-684bc8c6d-h8wnj     1/1     Running   0          7m8s
+giropops-senhas-684bc8c6d-jfv4k     1/1     Running   0          7m8s
+nginx                               1/1     Running   0          13s
+redis-deployment-76c5cdb57b-k9wvf   1/1     Running   0          46s
+
+k expose pod nginx
+
+## Ingress controller no aws eks
+
+### Install eksctl
+```
+# for ARM systems, set ARCH to: `arm64`, `armv6` or `armv7`
+ARCH=amd64
+PLATFORM=$(uname -s)_$ARCH
+
+curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+
+# (Optional) Verify checksum
+curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
+
+tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+
+sudo mv /tmp/eksctl /usr/local/bin
+```
+
+### Configure
+```
+eksctl create cluster \
+  --name=eks-cluster-1-27 \
+  --version=1.27 \
+  --region=us-east-1 \
+  --nodegroup-name=eks-cluster-1-27-nodegroup \
+  --node-type=t3.medium \
+  --nodes=2 \
+  --nodes-min=1 \
+  --nodes-max=3 \
+  --managed
+
+
+eksctl delete cluster \
+  --name=eks-cluster-1-27 \
+  --region=us-east-1
+```
+
+```
+eksctl create cluster \
+  --name=eks-cluster-1-28 \
+  --version=1.28 \
+  --region=us-east-1 \
+  --nodegroup-name=eks-cluster-1-28-nodegroup \
+  --node-type=t3.medium \
+  --nodes=2 \
+  --nodes-min=1 \
+  --nodes-max=3 \
+  --managed
+
+
+eksctl delete cluster \
+  --name=eks-cluster-1-28 \
+  --region=us-east-1
+```
+
+### Trabalhando com multi-context (cluster local, cluster remoto, cluster A e B)
+```
+k config current-context
+
+k config get-contexts
+
+k config use-context rodrigo.kumabe@eks-cluster-1-27.us-east-1.eksctl.io
+```
+
+### [AWS](https://kubernetes.github.io/ingress-nginx/deploy/#aws)
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.0/deploy/static/provider/aws/deploy.yaml
+
+kubectl get ns
+
+k get pods -n ingress-nginx
+
+k get svc -n ingress-nginx
+```
+
+
+```
+$ kaf app-deployment.yaml 
+deployment.apps/giropops-senhas created
+$ kaf app-service.yaml 
+service/giropops-senhas created
+$ kaf redis-deployment.yaml 
+deployment.apps/redis-deployment created
+$ kaf redis-service.yaml 
+service/redis-service created
+$ k get pods
+NAME                                READY   STATUS    RESTARTS   AGE
+giropops-senhas-684bc8c6d-pzc4c     1/1     Running   0          23s
+giropops-senhas-684bc8c6d-vc7z9     1/1     Running   0          23s
+redis-deployment-76c5cdb57b-xfm5w   1/1     Running   0          10s
+
+kaf ingress-5.yaml
+k get ingress
+```
+
+```
+Type: cname
+Name: giropops-senhas
+Value: a88f0c32eb86241e0b07a7fd5598cabd-81135536823911a1.elb.us-east-1.amazonaws.com
+TTL: 1/2 hora
+
+giropops-senhas.kumabe.com.br
+```

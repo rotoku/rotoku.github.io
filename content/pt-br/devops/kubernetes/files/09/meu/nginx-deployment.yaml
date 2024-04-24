@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: portfolio
+  name: portfolio
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: portfolio
+  template:
+    metadata:
+      labels:
+        app: portfolio
+    spec:
+      containers:
+      - image: rotoku/portfolio:latest
+        name: portfolio
+        ports:
+        - containerPort: 80
+        imagePullPolicy: Always
