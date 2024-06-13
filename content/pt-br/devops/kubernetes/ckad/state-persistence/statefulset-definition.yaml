@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: mysql
+    tier: db
+  name: mysql
+spec:
+  template:
+    metadata:
+      labels:
+        app: java-webapp
+        tier: frontend
+    spec:
+      containers:
+      - image: mysql
+        name: mysql
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mysql
+      tier: db
+  serviceName: mysql-h
+  ## OrderedReady (default): pod management is the default for StatefulSets. StatefulSet allows you to relax its ordering guarantees while preserving its uniqueness and identity guarantees via its .spec.podManagementPolicy field.
+  ## Parallel: pod management tells the StatefulSet controller to launch or terminate all Pods in parallel, and to not wait for Pods to become Running and Ready or completely terminated prior to launching or terminating another Pod. This option only affects the behavior for scaling operations. Updates are not affected.
+  podManagementPolicy: OrderedReady

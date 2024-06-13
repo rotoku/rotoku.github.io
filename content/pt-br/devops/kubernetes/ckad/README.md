@@ -1,8 +1,8 @@
 # CKAD - Certified Kubernetes Application Developer
 
-## 1. Introduction (17 minutes) - 17/04/2024
+## 1. Introduction (17 minutes)
 
-## 2. Core Concepts (2 hours 20 minutes) - 17/04/2024
+## 2. Core Concepts (2 hours 20 minutes)
 
 ```
 # Edit POD definition
@@ -37,7 +37,7 @@ kubectl [command] [TYPE] [NAME] -o <output_format>
 - -o wide Output in the plain-text format with any additional information.
 - -o yaml Output a YAML formatted API object.
 
-## 3. Configuration (3 hours 8 minutes) - 18/04/2024
+## 3. Configuration (3 hours 8 minutes)
 
 ```
 docker build -t alpine-sleeper .
@@ -437,7 +437,7 @@ spec:
 status: {}
 ```
 
-## 4. Multi-Container Pods (29 minutes) - 18/04/2024
+## 4. Multi-Container Pods (29 minutes)
 
 Contêineres de inicialização
 Em um pod com vários contêineres, espera-se que cada contêiner execute um processo que permaneça ativo enquanto durar o ciclo de vida do POD. Por exemplo, no pod de vários contêineres sobre o qual falamos anteriormente, que possui um aplicativo da web e um agente de registro, espera-se que ambos os contêineres permaneçam ativos o tempo todo. Espera-se que o processo em execução no contêiner do agente de log permaneça ativo enquanto o aplicativo Web estiver em execução. Se algum deles falhar, o POD será reiniciado.
@@ -489,7 +489,7 @@ spec:
 
 ```
 
-## 5. Observability (35 minutes) - 18/04/2024
+## 5. Observability (35 minutes)
 
 ```
 apiVersion: v1
@@ -513,19 +513,195 @@ spec:
       initialDelaySeconds: 80
 ```
 
-## 6. POD Design (1 hour 19 minutes) - 19/04/2024
+## 6. POD Design (1 hour 19 minutes)
+
+### Labels, Selectors and Annotations
+
+```
+kubectl get pods --selector env=dev
+kubectl get pods --selector bu=finance
+kubectl get all --selector env=prod
+kubectl get all --selector env=prod,bu=finance,tier=frontend
+```
+
+### Rolling Updates & Rollbacks in Deployments
+
+```
+kubectl create deployment nginx --image=nginx:1.16 --replicas=5 --dry-run=client -o yaml > deployment-definition.yaml
+kubectl create -f deployment-definition.yaml
+kubectl rollout status deployment nginx
+kubectl rollout history deployment nginx
+kubectl rollout history deployment nginx --revision=1
+kubectl set image deployment nginx nginx=nginx:1.17 --record ## Flag --record has been deprecated, --record will be removed in the future
+kubectl rollout history deployment nginx
+kubectl edit deployments.apps nginx --record
+kubectl rollout history deployment nginx --revision=3
+kubectl rollout undo deployment nginx
+kubectl rollout undo deployment nginx --to-revision=2
+```
+
+### Deployment Strategy - Blue Green
 
 ```
 
 ```
 
-## 7. Services & Networking (1 hour 56 minutes) - 19/04/2024
+### Deployment Strategy - Canary
 
 ```
 
 ```
 
-## 8. State Persistence (59 minutes) - 19/04/2024
+### Jobs
+
+```job-definition.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: throw-dice-job
+spec:
+  completions: 3
+  parallelism: 3
+  template:
+    spec:
+      containers:
+        - name: throw-dice-job
+          image: kodekloud/throw-dice
+      restartPolicy: Never
+  backoffLimit: 4
+```
+
+### CronJobs
+
+```
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: throw-dice-cron-job
+spec:
+  schedule: "30 21 * * *"
+  jobTemplate:
+    spec:
+      completions: 3
+      parallelism: 3
+      template:
+        spec:
+          containers:
+            - name: throw-dice-job
+              image: kodekloud/throw-dice
+          restartPolicy: Never
+      backoffLimit: 4
+```
+
+## 7. Services & Networking (1 hour 56 minutes)
+
+Services em K8s habilita a comunicação externa ao cluster para serviços internos e também comunicação entre serviços internos.
+
+## Services Types
+
+- ClusterIP
+- NodePort
+- LoadBalancer
+
+```
+kubectl create ingress <ingress-name> --rule="host/path=service:port"
+
+kubectl create ingress ingress-test --rule="wear.my-online-store.com/wear*=wear-service:80"
+```
+
+```service-definition-NodePort.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-webapp-service
+  labels:
+    app: java-webapp
+    tier: frontend
+spec:
+  type: NodePort
+  ports:
+    - targetPort: 8080 ## port in pod
+      port: 8080 ## port for service match port pod
+      nodePort: 30008 ## port expose externally
+  selector:
+    app: java-webapp
+    tier: frontend
+```
+
+Diferentes controladores de ingresso têm diferentes opções que podem ser usadas para personalizar a forma como funcionam. O controlador NGINX Ingress tem muitas opções que podem ser vistas aqui. Gostaria de explicar uma dessas opções que usaremos em nossos laboratórios. A opção Reescrever destino.
+
+## 8. State Persistence (59 minutes)
+
+```
+persistentVolumeReclaimPolicy: Recycle | Retain | Delete
+
+accessModes: ReadWriteOnce | ReadOnlyMany | ReadWriteMany | ReadWriteOncePod
+```
+
+### Static Provisioning
+
+```
+aws ec2 create-volume \
+    --volume-type ext4 \
+    --size 1 \
+    --availability-zone us-east-1a \
+    --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=data-volume}]'
+```
+
+```output.json
+{
+    "AvailabilityZone": "us-east-1a",
+    "Tags": [],
+    "Encrypted": true,
+    "VolumeType": "gp2",
+    "VolumeId": "vol-1234567890abcdef0",
+    "State": "creating",
+    "Iops": 240,
+    "SnapshotId": "",
+    "CreateTime": "YYYY-MM-DDTHH:MM:SS.000Z",
+    "Size": 80
+}
+```
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: random-number-generator
+spec:
+  containers:
+    - name: alpine
+      image: alpine
+      command:
+        - "/bin/sh"
+        - "-c"
+      args: ["shuf -i 0-100 -n 1 >> /opt/number.out;"]
+      volumeMounts:
+        - mountPath: /opt
+          name: data-volume
+  volumes:
+    - name: data-volume
+      awsElasticBlockStore:
+        volumeID: vol-1234567890abcdef0
+        fsType: ext4
+```
+
+### Dynamic Provisioning (PV is create automaticamente)
+
+1. Create StorageClass
+2. Create PVC with storageClassName matching with name define in StorageClass
+3. Create a POD with claimName matching with name define in pvc
+
+### Stateful Sets
+
+```
+kubectl create -f /media/rkumabe/DATA/git/rotoku/rotoku.github.io/content/pt-br/devops/kubernetes/ckad/state-persistence/statefulset-definition.yaml
+kubectl scale statefulset mysql --replicas=5
+kubectl scale statefulset mysql --replicas=3
+kubectl delete statefulset mysql
+```
+
+### Headless Services
 
 ```
 
@@ -533,8 +709,289 @@ spec:
 
 ## 9. Security (2 hours 34 minutes)
 
+### Basic Authentication
+
+> Setup basic authentication on Kubernetes (Deprecated in 1.19)
+
+```/etc/kubernetes/manifests/kube-apiserver.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-apiserver
+    - --authorization-mode=Node,RBAC
+      <content-hidden>
+    - --basic-auth-file=/tmp/users/user-details.csv
+    image: k8s.gcr.io/kube-apiserver-amd64:v1.11.3
+    name: kube-apiserver
+    volumeMounts:
+    - mountPath: /tmp/users
+      name: usr-details
+      readOnly: true
+  volumes:
+  - hostPath:
+      path: /tmp/users
+      type: DirectoryOrCreate
+    name: usr-details
+
 ```
 
+#### Create the necessary roles and role bindings for these users:
+
+```
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+
+```
+
+```
+# This role binding allows "jane" to read pods in the "default" namespace.
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: user1 # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: pod-reader # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+```
+
+```curl test
+curl -v -k https://localhost:6443/api/v1/pods -u "user1:password123"
+```
+
+### KubeConfig
+
+```
+curl https://127.0.0.1:37085/api/v1/pods --key admin.key --cert admin.crt --cacert ca.crt
+```
+
+```role-definition.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer
+  namespace: default
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - list
+  - create
+  - delete
+```
+
+```rolebinding-definition.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dev-user-binding
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: developer
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: dev-user
+```
+
+```another-role-definition.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer
+  namespace: blue
+rules:
+  - apiGroups:
+    - ""
+    resourceNames:
+    - dark-blue-app
+    resources:
+    - pods
+    verbs:
+    - get
+    - watch
+    - create
+    - delete
+  - apiGroups:
+    - apps
+    resources:
+    - deployments
+    verbs:
+    - create
+```
+
+```michelle-cluster-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: michelle-cluster-role
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - 'nodes'
+  verbs:
+  - '*'
+```
+
+```michelle-cluster-role-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: michelle-cluster-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: michelle-cluster-role
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: michelle
+```
+
+```michelle-cluster-role-storage-admin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: storage-admin
+rules:
+- apiGroups:
+  - 'storage.k8s.io'
+  resources:
+  - 'persistentvolumes'
+  verbs:
+  - '*'
+- apiGroups:
+  - 'storage.k8s.io'
+  resources:
+  - 'storageclasses'
+  verbs:
+  - '*'
+
+```
+
+```michelle-cluster-role-storage-admin-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: michelle-storage-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: storage-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: michelle
+```
+
+```view enabled admission controllers
+kubectl exec kube-apiserver-kumabes-cluster-control-plane -n kube-system -- kube-apiserver -h | grep enable-admission-plugins
+```
+
+```
+kubectl create secret tls webhook-server-tls -n webhook-demo --cert=/root/keys/webhook-server-tls.crt --key=/root/keys/webhook-server-tls.key
+```
+
+```
+curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/
+amd64/kubectl-convert
+
+chmod +x kubectl-convert
+
+mv kubectl-convert /usr/local/bin/kubectl-convert
+
+kubectl convert -f ingress-old.yaml --output-version networking.k8s.io/v1 > ingress-new.yaml
+
+kubectl apply -f ingress-new.yaml
+```
+
+### Custom Resource Definition
+
+```crd.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: internals.datasets.kodekloud.com
+spec:
+  group: datasets.kodekloud.com
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                internalLoad:
+                  type: string
+                range:
+                  type: integer
+                percentage:
+                  type: string
+  scope: Namespaced
+  names:
+    plural: internals
+    singular: internal
+    kind: Internal
+    shortNames:
+    - int
+```
+
+```custom.yaml
+kind: Internal
+apiVersion: datasets.kodekloud.com/v1
+metadata:
+  name: internal-space
+  namespace: default
+spec:
+  internalLoad: "high"
+  range: 80
+  percentage: "50"
+
+```
+
+### Custom Controller
+
+```
+git clone https://github.com/kubernetes/sample-controller
+cd sample-controller
+go build -o sample-controller .
+./sample-controller -kubeconfig=$HOME/.kube/config
+
+Para distribuir é necessário colocar o compilado go em uma imagem docker e fazer o deploy em um pod;
+
+
+```
+
+### Operator Framework
+
+```
+https://operatorhub.io
 ```
 
 ## 10. Helm Fundamentals (21 minutes)

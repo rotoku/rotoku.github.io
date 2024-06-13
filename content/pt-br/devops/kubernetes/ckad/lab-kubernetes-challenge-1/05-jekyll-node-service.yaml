@@ -1,0 +1,18 @@
+# Service 'jekyll' uses targetPort: '4000', namespace: 'development'
+# Service 'jekyll' uses Port: '8080', namespace: 'development'
+# Service 'jekyll' uses NodePort: '30097', namespace: 'development'
+apiVersion: v1
+kind: Service
+metadata:
+  name: jekyll-node-service
+  namespace: development
+  labels:
+    run: jekyll 
+spec:
+  type: NodePort
+  ports:
+    - targetPort: 4000
+      port: 8080
+      nodePort: 30097
+  selector:
+    run: jekyll 

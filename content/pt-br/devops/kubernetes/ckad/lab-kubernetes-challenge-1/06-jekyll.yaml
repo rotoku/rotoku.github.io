@@ -1,0 +1,30 @@
+# pod: 'jekyll' has an initContainer, name: 'copy-jekyll-site', image: 'kodekloud/jekyll'
+# initContainer: 'copy-jekyll-site', command: [ "jekyll", "new", "/site" ] (command to run: jekyll new /site)
+# pod: 'jekyll', initContainer: 'copy-jekyll-site', mountPath = '/site'
+# pod: 'jekyll', initContainer: 'copy-jekyll-site', volume name = 'site'
+# pod: 'jekyll', container: 'jekyll', volume name = 'site'
+# pod: 'jekyll', container: 'jekyll', mountPath = '/site'
+# pod: 'jekyll', container: 'jekyll', image = 'kodekloud/jekyll-serve'
+# pod: 'jekyll', uses volume called 'site' with pvc = 'jekyll-site'
+# pod: 'jekyll' uses label 'run=jekyll'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jekyll
+  labels:
+    run: jekyll
+spec:
+  initContainers:
+    - name: copy-jekyll-site
+      image: kodekloud/jekyll
+      command: ["jekyll", "new", "/site"]
+  containers:
+    - name: jekyll
+      image: kodekloud/jekyll
+      volumeMounts:
+        - mountPath: /site
+          name: site
+  volumes:
+    - name: site
+      persistentVolumeClaim:
+        claimName: jekyll-site

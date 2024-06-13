@@ -9,7 +9,7 @@ spec:
     app: portfolio
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 80 ## port for service match port pod
+      targetPort: 80  ## port in pod
       name: tcp-app
   type: ClusterIP
