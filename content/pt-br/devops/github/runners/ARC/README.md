@@ -88,15 +88,35 @@ helm install arc \
 ## Install Runner Scale Set
 
 ```
-k create secret gh-app
+k create arc-runners
+kubectl apply -f /media/rkumabe/DATA/Documents/md/2024/gh-app-arc-community-secret.yaml
 
-helm install arc \
+## First time
+helm install kumabes-runner-large \
     --namespace arc-runners \
     -f /media/rkumabe/DATA/workspaces/arc-configuration/runner-scale-set-1/values.yaml \
     oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
     --version "0.9.2"
 
+helm install arc-kumabes-runner-small \
+    --create-namespace \
+    --namespace arc-runners \
+    -f /media/rkumabe/DATA/workspaces/arc-configuration/runner-scale-set-2/values.yaml \
+    oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
+    --version "0.9.2"
+
+helm install kumabes-runner-dind-medium \
+    --create-namespace \
+    --namespace arc-runners \
+    -f /media/rkumabe/DATA/workspaces/arc-configuration/runner-scale-set-3/values.yaml \
+    oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
+    --version "0.9.2"
+
+
 helm list -A
+
+
+helm uninstall kumabes-runner-large -n arc-runners
 ```
 
 ## DIND
