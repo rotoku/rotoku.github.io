@@ -3,26 +3,15 @@ languageCode="pt-br"
 title="Kumabe's GitHub Pages"
 theme = ["github.com/google/docsy"]
 
+# emoji
+# https://www.webfx.com/tools/emoji-cheat-sheet/
+enableEmoji=true
+
+rss_sections = ["blog"]
+
 # Language settings
 contentDir = "content/pt-br"
 defaultContentLanguage = "pt-br"
-defaultContentLanguageInSubdir = false
-# Useful when translating.
-enableMissingTranslationPlaceholders = true
-
-enableRobotsTXT = true
-
-# Will give values to .Lastmod etc.
-enableGitInfo = true
-
-# Comment out to enable taxonomies in Docsy
-# disableKinds = ["taxonomy", "taxonomyTerm"]
-
-# You can add your own taxonomies
-[taxonomies]
-tag = "tags"
-category = "categories"
-
 [languages]
 [languages.pt-br]
 title="Kumabe's GitHub Pages"
@@ -30,11 +19,15 @@ languageName="Português"
 # weight used for sorting
 weight=1
 
-# emoji
-enableEmoji=true
+staticDir = ["static"]
 
-rss_sections = ["blog"]
+# mermaid
+[params.mermaid]
+enable = true
 
+# Parâmetros de feedback
+[params.ui.feedback]
+enable = true
 
 # Highlighting config
 pygmentsCodeFences = true
@@ -45,28 +38,36 @@ pygmentsUseClassic = false
 # See https://help.farbox.com/pygments.html
 pygmentsStyle = "tango"
 
+# Configure how URLs look like per section.
+[permalinks]
+blog = "/:section/:year/:month/:day/:slug/"
+
 [imaging]
 resampleFilter = "CatmullRom"
 quality = 75
 anchor = "smart"
 
-staticDir = ["static"]
+[markup]
+  defaultMarkdownHandler = "goldmark"
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    # See a complete list of available styles at https://xyproto.github.io/splash/docs/all.html
+    style = "dracula"
+    lineNos = true
+    anchorLineNos = true
+    # Uncomment if you want your chosen highlight style used for code blocks without a specified language
+    # guessSyntax = "true"
 
 [params]
 copyright = "Kumabe"
-privacy_policy = "https://policies.google.com/privacy"
 
-# Menu title if your navbar has a versions selector to access old versions of your site.
-# This menu appears only if you have at least one [params.versions] set.
-version_menu = "Releases"
+# Configuração do repositório (URLs para links na página para abrir problemas e sugerir alterações)
+github_repo = "https://github.com/rotoku/rotoku.github.io"
 
-# Flag used in the "version-banner" partial to decide whether to display a
-# banner on every page indicating that this is an archived version of the docs.
-# Set this flag to "true" if you want to display the banner.
-archived_version = false
-
-# Enable syntax highlighting and copy buttons on code blocks with Prism
-prism_syntax_highlighting = false
+# Enable Lunr.js offline search
+offlineSearch = true
 
 # User interface configuration
 [params.ui]
@@ -86,13 +87,37 @@ sidebar_menu_foldable = true
 [params.ui.readingtime]
 enable = true
 
-# Parâmetros de feedback
-[params.ui.feedback]
-enable = true
+defaultContentLanguageInSubdir = false
+# Useful when translating.
+enableMissingTranslationPlaceholders = true
 
-# mermaid
-[params.mermaid]
-enable = true
+enableRobotsTXT = true
+
+# Will give values to .Lastmod etc.
+enableGitInfo = true
+
+# Comment out to enable taxonomies in Docsy
+# disableKinds = ["taxonomy", "taxonomyTerm"]
+
+# You can add your own taxonomies
+[taxonomies]
+tag = "tags"
+category = "categories"
+
+
+
+# Menu title if your navbar has a versions selector to access old versions of your site.
+# This menu appears only if you have at least one [params.versions] set.
+version_menu = "Releases"
+
+# Flag used in the "version-banner" partial to decide whether to display a
+# banner on every page indicating that this is an archived version of the docs.
+# Set this flag to "true" if you want to display the banner.
+archived_version = false
+
+# Enable syntax highlighting and copy buttons on code blocks with Prism
+prism_syntax_highlighting = false
+
 
 [[menu.main]]
     name = "Programação"
