@@ -4,13 +4,10 @@ date: 2023-07-16T11:46:56-03:00
 weight: 1
 ---
 
----------------
----------------
----------------
-
-# I am an IT professional, with over 20 years of experience in the area of information technology with a strong knowledge in software architecture, software engineering and DevSecOps Culture/Practices.
+# I am an IT professional, with over 21 years of experience in the area of information technology with a strong knowledge in software architecture, software engineering and DevSecOps Culture/Practices.
 
 ## Soft skills:
+
 - Analytical ability
 - DevOps Culture.
 - Entrepreneurship
@@ -27,6 +24,7 @@ weight: 1
 - Ability to update frequently with new technological trends
 
 ## Hard skills:
+
 - Masters good programming practices (OOP - Object Oriented Programming)
 - 12 Factors
 - Design patterns;
