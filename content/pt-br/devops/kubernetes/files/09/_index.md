@@ -1,10 +1,12 @@
 # DAY 09
 
 ## Ingress
+
 O Ingress é um recurso do Kubernetes que gerencia o acesso externo aos serviços dentro de um cluster. Ele funciona como uma camada de roteamento HTTP/HTTPS, permitindo a definição de regras para direcionar o tráfego externo para diferentes serviços back-end. O Ingress é implementado através de um controlador de Ingress, que pode ser alimentado por várias soluções, como NGINX, Traefik ou Istio, para citar alguns.
 Tecnicamente, o Ingress atua como uma abstração de regras de roteamento de alto nível que são interpretadas e aplicadas pelo controlador de Ingress. Ele permite recursos avançados como balanceamento de carga, SSL/TLS, redirecionamento, reescrita de URL, entre outros.
 
 ### Principais Componentes e Funcionalidades:
+
 - Controlador de Ingress: É a implementação real que satisfaz um recurso Ingress. Ele pode ser implementado através de várias soluções de proxy reverso, como NGINX ou HAProxy.
 - Regras de Roteamento: Definidas em um objeto YAML, essas regras determinam como as requisições externas devem ser encaminhadas aos serviços internos.
 - Backend Padrão: Um serviço de fallback para onde as requisições são encaminhadas se nenhuma regra de roteamento for correspondida.
@@ -13,6 +15,7 @@ Tecnicamente, o Ingress atua como uma abstração de regras de roteamento de alt
 - Anexos de Recurso: Possibilidade de anexar recursos adicionais como ConfigMaps ou Secrets, que podem ser utilizados para configurar comportamentos adicionais como autenticação básica, listas de controle de acesso etc.
 
 ### Tipos de ingress:
+
     - [ingress nginx controller](https://kubernetes.github.io/ingress-nginx/)
     - gce ingress
     - aws ingress
@@ -22,7 +25,9 @@ Tecnicamente, o Ingress atua como uma abstração de regras de roteamento de alt
     - istio
 
 ### Habilitando o Ingress no Minikube
+
 Para habilitar o Ingress no Minikube, basta executar o comando:
+
 ```bash
 minikube addons enable ingress
 kubectl create deployment demo --image=httpd --port=80
@@ -33,35 +38,37 @@ curl --resolve demo.localdev.me:8080:127.0.0.1 http://demo.localdev.me:8080
 ```
 
 Para habilitar o Ingress no Kind, basta criar um arquivo de configuração do Kind com o seguinte conteúdo:
+
 ```yaml
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
-- role: control-plane
-  kubeadmConfigPatches:
-  - |
-    kind: InitConfiguration
-    nodeRegistration:
-      kubeletExtraArgs:
-        node-labels: "ingress-ready=true"
-  extraPortMappings:
-  - containerPort: 80
-    hostPort: 80
-    protocol: TCP
-  - containerPort: 443
-    hostPort: 443
-    protocol: TCP
-- role: worker
-- role: worker    
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+  - role: worker
+  - role: worker
 ```
 
 ```
-kind create cluster --config /media/rkumabe/DATA/git/rotoku.github.io/content/pt-br/devops/kubernetes/files/09/kind-cluster.yaml --name kind-cluster
+kind create cluster --config /media/rkumabe/DATA/git/rotoku/rotoku.github.io/content/pt-br/devops/kubernetes/files/09/kind-cluster.yaml --name kumabes-k8s-cluster
 kind get clusters
 kind delete clusters $(kind get clusters)
 ```
 
 ### Instalando um Ingress Controller usando o Kind
+
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
 
@@ -104,6 +111,7 @@ kubectl create ingress contatos-app \
 
 kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 3000:80
 ```
+
 kubectl get ingress
 kubectl get ingress contatos-app-ingress -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 kubectl get ingress contatos-app-ingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -111,17 +119,18 @@ kubectl get ingress contatos-app-ingress -o jsonpath='{.status.loadBalancer.ingr
 $ k run nginx --image nginx --port 80
 
 $ k get pods
-NAME                                READY   STATUS    RESTARTS   AGE
-giropops-senhas-684bc8c6d-h8wnj     1/1     Running   0          7m8s
-giropops-senhas-684bc8c6d-jfv4k     1/1     Running   0          7m8s
-nginx                               1/1     Running   0          13s
-redis-deployment-76c5cdb57b-k9wvf   1/1     Running   0          46s
+NAME READY STATUS RESTARTS AGE
+giropops-senhas-684bc8c6d-h8wnj 1/1 Running 0 7m8s
+giropops-senhas-684bc8c6d-jfv4k 1/1 Running 0 7m8s
+nginx 1/1 Running 0 13s
+redis-deployment-76c5cdb57b-k9wvf 1/1 Running 0 46s
 
 k expose pod nginx
 
 ## Ingress controller no aws eks
 
 ### Install eksctl
+
 ```
 # for ARM systems, set ARCH to: `arm64`, `armv6` or `armv7`
 ARCH=amd64
@@ -138,6 +147,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 ```
 
 ### Configure
+
 ```
 eksctl create cluster \
   --name=eks-cluster-1-27 \
@@ -175,6 +185,7 @@ eksctl delete cluster \
 ```
 
 ### Trabalhando com multi-context (cluster local, cluster remoto, cluster A e B)
+
 ```
 k config current-context
 
@@ -184,6 +195,7 @@ k config use-context rodrigo.kumabe@eks-cluster-1-27.us-east-1.eksctl.io
 ```
 
 ### [AWS](https://kubernetes.github.io/ingress-nginx/deploy/#aws)
+
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.0/deploy/static/provider/aws/deploy.yaml
 
@@ -194,15 +206,14 @@ k get pods -n ingress-nginx
 k get svc -n ingress-nginx
 ```
 
-
 ```
-$ kaf app-deployment.yaml 
+$ kaf app-deployment.yaml
 deployment.apps/giropops-senhas created
-$ kaf app-service.yaml 
+$ kaf app-service.yaml
 service/giropops-senhas created
-$ kaf redis-deployment.yaml 
+$ kaf redis-deployment.yaml
 deployment.apps/redis-deployment created
-$ kaf redis-service.yaml 
+$ kaf redis-service.yaml
 service/redis-service created
 $ k get pods
 NAME                                READY   STATUS    RESTARTS   AGE

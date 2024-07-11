@@ -1,3 +1,10 @@
+---
+title: "CKAD"
+linkTitle: "CKAD"
+date: 2024-02-14
+weight: 2
+---
+
 # CKAD - Certified Kubernetes Application Developer
 
 ## 1. Introduction (17 minutes)
