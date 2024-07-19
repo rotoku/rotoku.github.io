@@ -5,6 +5,12 @@ date: 2024-02-14
 weight: 5
 ---
 
+---
+
+---
+
+---
+
 # Kubernetes and Cloud Native Security Associate (KCSA)
 
 ## Why is compliance with supply chain security standards crucial in a Kubernetes environment?
@@ -36,6 +42,74 @@ weight: 5
 
 - To minimize the risk of misconfiguration and human error in volume creation
   > The key security benefit of using dynamic provisioning for persistent volumes in a Kubernetes environment is to minimize the risk of misconfiguration and human error in the creation of volumes. Dynamic provisioning automates the process of creating and managing storage resources, reducing the likelihood of manual errors or misconfigurations that could lead to security vulnerabilities, such as improper access controls or unencrypted sensitive data.
+
+## In the context of Kubernetes platform security, how does a service mesh like Istio improve security?
+
+- By enabling mutual TLS (mTLS) for secure service-to-service communication
+  > A service mesh like Istio improves security in a Kubernetes environment by enabling mutual TLS (mTLS) for secure service-to-service communication. mTLS ensures that both the client and server in a communication verify each other's identities, enabling encrypted and authenticated communication between services. This is crucial for protecting sensitive data and communications from eavesdropping and man-in-the-middle attacks within the Kubernetes cluster
+
+## Which of the following is an effective isolation technique for securing containerized applications by preventing container escape attacks?
+
+- Utilizing Runtime Security Tools
+  > Runtime Security Tools, such as Falco or Sysdig, are designed to monitor and protect containers at runtime. They can detect anomalous activities and potential threats, such as container escape attempts, providing an effective isolation technique to secure containerized applications against such attacks.
+
+## What is an important security consideration when configuring the Kubernetes Scheduler to ensure the safe placement of pods in a multi-tenant environment?
+
+- Configuring pod affinity and anti-affinity rules
+  > In a multi-tenant environment, configuring pod affinity and anti-affinity rules in the Kubernetes Scheduler is important for security. These rules help in safely placing pods by ensuring that they are scheduled on appropriate nodes, potentially isolating workloads of different tenants for security reasons, and preventing conflicts or unauthorized access between them.
+
+## In the context of the 4Cs of Cloud Native Security, which layer primarily focuses on the protection of sensitive data and compliance with regulatory frameworks?
+
+- Cloud Infrastructure Security
+  > Cloud Infrastructure Security is crucial for protecting sensitive data and ensuring compliance with various regulatory frameworks. This layer involves securing the underlying infrastructure on which applications and services are hosted, including networks, servers, and storage systems.
+
+## In Kubernetes, what is a key security practice for pods to ensure that they only communicate with authorized services or components within the cluster?
+
+- Applying Network Policies to pods
+  > Applying Network Policies to pods in Kubernetes is a key security practice to control and restrict which network connections are allowed to and from the pods. This ensures that pods only communicate with authorized services or components, thereby preventing potential security breaches through unauthorized network access.
+
+## What is the DREAD Threat Modeling approach?
+
+- Microsoft developed the DREAD threat modeling approach to detect and prioritize threats so that serious threats can be mitigated first. It was first published in ‘Writing Secure Code’ 2nd edition by David LeBlanc and Michael Howard in 2002. Though Microsoft stopped using the DREAD threat modeling approach, smaller organizations, Fortune 500 companies, and the military continue to use it. DREAD stands for:
+  - D – Damage potential
+  - R – Reproducibility
+  - E – Exploitability
+  - A – Affected users
+  - D – Discoverability
+- We rank these factors on a scale from 0-10 and calculate the sum of these values. If the resulting value is higher, the risk of a potential attack on the organization is greater and we need to employ mitigation strategies immediately.
+
+## CVSS
+
+- Common Vulnerability Scoring System é um padrão da indústria gratuito e aberto para avaliar a gravidade das vulnerabilidades de segurança do sistema de computador. O CVSS tenta atribuir pontuações de gravidade às vulnerabilidades, permitindo que os respondentes priorizem respostas e recursos de acordo com a ameaça.
+
+## In the framework of the 4Cs of Cloud Native Security, which layer focuses on securing the infrastructure on which applications run, such as virtual machines, networks, and storage?
+
+- Cloud Security
+  > Cloud Security in the 4Cs framework refers to the protection of the underlying infrastructure used to run applications. This includes securing virtual machines, networks, storage, and other foundational components provided by the cloud provider.
+
+## What is a critical security practice for the Kubernetes Controller Manager to ensure the integrity of the cluster’s control plane?
+
+- Regularly updating the Controller Manager to the latest version
+  > Regularly updating the Kubernetes Controller Manager to the latest version is a critical security practice. This ensures that the Controller Manager, a key component of the cluster's control plane, has the latest security patches and improvements. Keeping it updated helps protect against known vulnerabilities and exploits that could compromise the integrity of the cluster's control plane.
+
+## Health Insurance Portability and Accountability Act
+
+- A Lei de Portabilidade e Responsabilidade do Seguro Saúde de 1996 ( HIPAA ou Lei Kennedy – Kassebaum [1] [2] ) é uma Lei do Congresso dos Estados Unidos promulgada pelo 104º Congresso dos Estados Unidos e sancionada pelo Presidente Bill Clinton em 21 de agosto de 1996. [3] Ela visava alterar a transferência de informações de saúde, estipulava as diretrizes pelas quais as informações de identificação pessoal mantidas pelos setores de saúde e seguro saúde deveriam ser protegidas contra fraude e roubo, [4] e abordava algumas limitações na cobertura do seguro saúde . Ela geralmente proíbe provedores de saúde e empresas chamadas entidades cobertas de divulgar informações protegidas a qualquer pessoa que não seja um paciente e os representantes autorizados do paciente sem seu consentimento. O projeto de lei não restringe os pacientes de receber informações sobre si mesmos (com exceções limitadas). [5] Além disso, não proíbe os pacientes de compartilhar voluntariamente suas informações de saúde da maneira que escolherem, nem exige confidencialidade quando um paciente divulga informações médicas a familiares, amigos ou outros indivíduos que não sejam funcionários de uma entidade coberta. O ato é composto por 5 títulos:
+  - O Título I protege a cobertura do seguro de saúde para os trabalhadores e suas famílias quando mudam ou perdem seus empregos. [6]
+  - O Título II, conhecido como disposições de Simplificação Administrativa (AS), exige o estabelecimento de padrões nacionais para transações eletrônicas de - assistência médica e identificadores nacionais para provedores, planos de seguro saúde e empregadores. [7]
+  - O Título III define diretrizes para contas de gastos médicos antes dos impostos.
+  - O Título IV define diretrizes para planos de saúde de grupo.
+  - O Título V rege as apólices de seguro de vida de propriedade da empresa.
+
+## Common Vulnerability Scoring System
+
+- O Common Vulnerability Scoring System ( CVSS ) é um padrão industrial gratuito e aberto para avaliar a gravidade das vulnerabilidades de segurança de sistemas de computador . O CVSS tenta atribuir pontuações de gravidade às vulnerabilidades, permitindo que os respondentes priorizem respostas e recursos de acordo com a ameaça. As pontuações são calculadas com base em uma fórmula que depende de várias métricas que aproximam a facilidade e o impacto de uma exploração. As pontuações variam de 0 a 10, sendo 10 a mais grave. Embora muitos usem apenas a pontuação base do CVSS para determinar a gravidade, também existem pontuações temporais e ambientais para levar em consideração a disponibilidade de mitigações e a extensão dos sistemas vulneráveis ​​dentro de uma organização, respectivamente. A versão atual do CVSS (CVSSv4.0) foi lançada em novembro de 2023. [1]
+
+## O que é MITRE ATT&CK e como usar esse framework?
+
+- O framework MITRE ATT&CK é um dos mais amplamente conhecidos e usados no mundo da cibersegurança. Na International IT, estamos comprometidos em fornecer serviços e soluções de alta qualidade em cibersegurança e TI, e reconhecemos a importância dessa estrutura em nossa abordagem.
+- O MITRE ATT&CK é uma base de conhecimento de ameaças e ações mantida e desenvolvida pela MITRE Corporation em colaboração com a indústria e outros stakeholders. A MITRE Corporation é uma organização sem fins lucrativos financiada pelo governo federal dos EUA, encarregada de desenvolver soluções para manter os EUA seguros contra várias ameaças, incluindo as ameaças cibernéticas. O MITRE ATT&CK é um dos resultados desse trabalho e serve como base para identificar e construir proteções contra ameaças específicas de cibercriminosos.
+- O nome ATT&CK é um acrônimo para Adversarial Tactics, Techniques and Common Knowledge. O MITRE ATT&CK está disponível gratuitamente para uso global por empresas privadas, governos ou fornecedores de soluções de cibersegurança.
 
 ## Cloud Native Security
 
