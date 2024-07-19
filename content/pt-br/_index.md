@@ -4,6 +4,12 @@ date: 2023-07-16T11:46:56-03:00
 weight: 1
 ---
 
+---
+
+---
+
+---
+
 # I am an IT professional, with over 21 years of experience in the area of information technology with a strong knowledge in software architecture, software engineering and DevSecOps Culture/Practices.
 
 ## Soft skills:
