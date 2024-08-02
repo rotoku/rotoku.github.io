@@ -548,3 +548,188 @@ regions:
     {{- end }}
     app: webapp-color
 ```
+
+### Named Templates / Partial
+
+```_helpers.tpl
+{{- define "labels" }}
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+```
+
+```service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-nginx
+  labels:
+    {{- template "labels" . }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: hell-world
+```
+
+```deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-nginx
+  labels:
+    {{- template "labels" . }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "labels" . | indent 2 }}
+
+  template:
+    metadata:
+      labels:
+        {{- include "labels" . | indent 4 }}
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.16.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+```
+
+### Chart Hooks
+
+basic flow when user installs or upgrade helm chart:
+
+- helm install --> verify --> render --> |pre-upgrade hooks| --> install --> |post-upgrade hooks|
+- helm delete --> verify --> render --> |pre-upgrade hooks| --> delete --> |post-upgrade hooks|
+- helm upgrade --> verify --> render --> |pre-upgrade hooks| --> upgrade --> |post-upgrade hooks|
+- helm rollback --> verify --> render --> |pre-upgrade hooks| --> rollback --> |post-upgrade hooks|
+
+> |pre-upgrade hooks|: could backup database, post announcements to the customers.
+> |post-upgrade hooks|: could send e-mail to the customers.
+
+#### Creating Hooks
+
+- create job in kubernetes
+
+```job-backup.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-nginx
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": hook-succeeded ## hook-succeeded, hook-failed, before-hook-creation (default)
+spec:
+  template:
+    metadata:
+      name: {{ .Release.Name }}-nginx
+    spec:
+      containers:
+        - name: pre-upgrade-backup-job
+          image: "alpine"
+          command: ["/bin/backup.sh"]
+      restartPolicy: Never
+
+```
+
+### Packaging and Signing Charts
+
+```
+helm package ./nginx-chart
+```
+
+- private key
+- provenance
+
+#### dev
+
+```
+gpg --quick-generate-key "Rodrigo Kumabe"
+```
+
+#### prod
+
+```
+gpg --full-generate-key "Rodrigo Kumabe"
+```
+
+#### GnuPG older is more used than earlier
+
+```
+gpg --export-secret-keys > ~/.gnupg/secring.gpg
+```
+
+#### Package using the right way
+
+```
+helm package --sign \
+  --key "Rodrigo Kumabe" \
+  --keyring ~/.gnupg/secring.gpg \
+  ./nginx-chart
+```
+
+```
+gpg --list-keys
+```
+
+```
+ls
+nginx-chart nginx-chart-0.1.0.tgz nginx-chart-0.1.0.tgz.prov
+```
+
+##### verify signature
+
+```
+helm verify ./nginx-chart-0.1.0.tgz
+```
+
+```
+gpg --export "Rodrigo Kumabe" > mypublickey
+```
+
+```
+helm verify --keyring ./mypublic ./nginx-chart-0.1.0.tgz
+```
+
+```
+gpg --recv-keys --keyserver keyserver.ubuntu.com 5465465464XVKVZXVJLXVCXC
+```
+
+```
+helm install --verify nginx-chart-0.1.0
+```
+
+### Uploading Charts
+
+- package
+- index.yaml
+- provenance
+
+#### generate index.yaml
+
+```
+$ ls
+nginx-chart nginx-chart-0.1.0.tgz nginx-chart-0.1.0.tgz.prov
+
+$ mkdir nginx-chart-files
+
+$ cp nginx-chart-0.1.0.tgz nginx-chart-0.1.0.tgz.prov ./nginx-chart-files
+
+$ helm repo index nginx-chart-files/ --url https://example.com/charts
+```
+
+#### Use custom helm chart
+
+```
+helm repo add our-cool-charts https://example.com/charts
+helm install my-new-release our-cool-charts/nginx-chart
+```

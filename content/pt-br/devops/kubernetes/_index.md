@@ -866,3 +866,21 @@ alias kds="kubectl delete services"
 alias kdd="kubectl delete deployments"
 alias kdn="kubectl delete namespaces"
 ```
+
+## 1.27 - Chill Vibes - 2023 - 60 melhorias
+
+- The k8s.gcr.io image registry has been frozen (moved to registry.k8s.io)
+- SeccompDefault has graduated to stable
+- Node log access is now possible via the k8s API
+- Mutable scheduling directives for jobs have graduated to GA, while mutable pod scheduling directives have gone to beta
+- DownwardAPIHugePages has graduated to stable
+- Pod scheduling Readiness has gone to beta
+- ReadWriteOncePod PersistentVolume Access mode has also gone to beta
+- We now faster selinux volume relabeling using mounts
+- Robust volumemanager reconstruction has gone to beta
+
+## 1.28
+
+## 1.29
+
+## 1.30
