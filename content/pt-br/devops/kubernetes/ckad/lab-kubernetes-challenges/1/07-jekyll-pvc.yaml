@@ -1,7 +1,3 @@
-# Storage Request: 1Gi
-# Access modes: ReadWriteMany
-# pvc name = jekyll-site, namespace = development
-# 'jekyll-site' PVC should be bound to the PersistentVolume called 'jekyll-site'.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -10,6 +6,7 @@ metadata:
 spec:
   accessModes:
     - "ReadWriteMany"
+  storageClassName: local-storage  
   resources:
     requests:
       storage: 1Gi
