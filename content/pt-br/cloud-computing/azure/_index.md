@@ -25,6 +25,9 @@ Métodos de acesso:
 - sdk
 
 ```
+az config set core.allow_broker=true
+az account clear
+az login --use-device-code
 az resource list
 ```
 
