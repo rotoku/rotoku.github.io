@@ -768,6 +768,215 @@ Por que Projetos?
 - Projeto Padrão
   - O ArgoCD cria um projeto padrão assim que você o instala.
 
+### Opções de criação de projeto
+
+- Declarativa
+
+```
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project-1
+  namespace: argocd
+spec:
+  description: project description
+  sourceRepos:
+    - “*”
+  destinations:
+    - server: “*”
+      namespace: “*“
+  clusterResourceWhitelist:
+    - group: “*”
+      kind: “*“
+  namespaceResourceWhitelist:
+    - group: “*”
+      kind: “*"
+
+```
+
+- CLI
+
+```
+
+```
+
+- Web UI
+  ![Web UI Project](../../../../../static/imgs/PROJECT_VIA_UI.png)
+
+```Destino especifico
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project-1
+  namespace: argocd
+spec:
+  description: project description
+  sourceRepos:
+    - “*”
+  destinations: # Only permit applications to deploy to the ns-1 namespace in the same cluster
+    - server: https://kubernetes.default.svc
+      namespace: “ns-1“
+  clusterResourceWhitelist:
+    - group: “*”
+      kind: “*“
+  namespaceResourceWhitelist:
+    - group: “*”
+      kind: “*"
+```
+
+```Repositório de Fonte Específica
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project-1
+  namespace: argocd
+spec:
+  description: project description
+  sourceRepos: # Only permit this Git repos
+    - “https://github.com/mabusaa/argocd-example-apps.git”
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: “ns-1“
+  clusterResourceWhitelist:
+    - group: “*”
+      kind: “*“
+  namespaceResourceWhitelist:
+    - group: “*”
+      kind: “*"
+```
+
+```Permitir recursos específicos do escopo do cluster
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project-1
+  namespace: argocd
+spec:
+  description: project description
+  sourceRepos:
+    - “*”
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: “ns-1“
+  clusterResourceWhitelist: # Deny all cluster-scoped resources from being created, except for Namespace
+    - group: “”
+      kind: “Namespace“
+  namespaceResourceWhitelist:
+    - group: “*”
+      kind: “*"
+```
+
+```Permitir recursos específicos com escopo de namespace
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project-1
+  namespace: argocd
+spec:
+  description: project description
+  sourceRepos:
+    - “*”
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: “ns-1“
+  clusterResourceWhitelist:
+    - group: “”
+      kind: “Namespace“
+  namespaceResourceWhitelist: # Deny all namespaced-scoped resources from being created, except for Deployment
+    - group: “apps”
+      kind: “Deployment"
+```
+
+```Lista negra de recursos específicos com escopo de namespace
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project-1
+  namespace: argocd
+spec:
+  description: project description
+  sourceRepos:
+    - “*”
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: “ns-1“
+  clusterResourceWhitelist:
+    - group: “”
+      kind: “Namespace“
+  namespaceResourceBlacklist: # Allow all namespaced-scoped resources to be created, except for NetworkPolicy
+    - group: “”
+      kind: “NetworkPolicy"
+```
+
+```Definir projeto no aplicativo
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: guestbook
+  namespace: argocd
+spec:
+  destination:
+    namespace: guestbook
+    server: "https://kubernetes.default.svc"
+  project: project-1
+  source:
+    path: helm-guestbook
+    repoURL: "https://github.com/argoproj/argocd-example-apps.git"
+    targetRevision: HEAD
+```
+
+### Recurso de Funções do Projeto
+
+Permite que você crie uma função com um conjunto de políticas “permissões” para conceder acesso aos aplicativos de um projeto.
+
+- Você pode usá-lo para conceder ao sistema CI um acesso específico aos aplicativos do projeto.
+  - Ele deve ser associado ao JWT.
+- Você pode usá-lo para conceder aos grupos oidc um acesso específico aos aplicativos do projeto.
+
+```Função do projeto
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project-1
+  namespace: argocd
+spec:
+  description: project description
+  sourceRepos:
+    - “*”
+
+  destinations:
+    - server: “*”
+      namespace: “*“
+
+  clusterResourceWhitelist:
+    - group: “*”
+      kind: “*“
+
+  roles:
+    - name: ci-role
+      description: Sync privileges for demo-project
+      policies:
+      - p,proj:demo-project:ci-role,applications,sync,demo-project/*,allow
+```
+
+### Criando um token
+
+- As funções do projeto não são úteis sem gerar um JWT.
+- Os tokens gerados não são armazenados no ArgoCD.
+- Para criar um token usando CLI:
+
+```
+argocd proj role create-token PROJECT ROLE-NAME
+```
+
+### Usando o token na CLI
+
+- Um usuário pode alavancar tokens na CLI passando-os usando o sinalizador "--auth-token" ou definindo a variável de ambiente "ARGOCD_AUTH_TOKEN".
+
+```
+argocd cluster list --auth-token <TOKEN_VALUE>
+```
+
 ## 06. Repositories
 
 50
