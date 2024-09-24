@@ -87,3 +87,12 @@ echo "<h1>Hello World from `hostname`!</h1>" > /var/www/html/index.html
 service ds_agent stop
 chkconfig ds_agent off
 ```
+
+
+### Useful commands
+```
+aws ec2 describe-instances
+aws ec2 describe-instances --filters "Name=tag:Name,Values=prometheus-ubuntu" | jq -r '.Reservations[].Instances[].InstanceId'
+
+aws ec2 start-instances --instance-ids $(aws ec2 describe-instances --filters "Name=tag:Name,Values=prometheus-ubuntu" | jq -r '.Reservations[].Instances[].InstanceId')
+```
