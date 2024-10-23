@@ -710,8 +710,49 @@ pushadd_to_gateway('user2:9091', job='batch',registry=registry)
 
 ## Alerting(Alertmanager & notifications)
 
+- Alerts at Prometheus
+- Alerts at Grafana
+- Alertmanager
+
 ### Introduction
+
+```/etc/prometheus/prometheus.yaml
+.
+.
+.
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "rules.yaml"
+.
+.
+.  
 ```
+
+```/etc/prometheus/rules.yaml
+groups:
+  - name: my-alerts
+    interval: 15s
+    rules:
+      - alert: NodeDown
+        expr: up{job="ervil"} == 0
+        for: 2m
+        labels:
+          team: infra
+          env: prod
+        annotations:
+          message: "Instance {{ .Labels.instance }} is currently down"    
+      - alert: NodeDown
+        expr: up{job="gary-lnx"} == 0
+        for: 2m
+        labels:
+          team: infra
+          env: prod
+        annotations:
+          message: "Instance {{ .Labels.instance }} is currently down" 
+```
+
+
+```/etc/prometheus/rules.yaml
 groups:
   - name: node
     interval: 15s
@@ -835,7 +876,72 @@ sudo systemctl status alertmanager
 ```
 
 ### Configuration
-```alertmanager.yml
+
+#### Default Example
+```/etc/alertmanager/alertmanager.yml
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 5m
+  receiver: 'web.hook'
+receivers:
+  - name: 'web.hook'
+    webhook_configs:
+      - url: 'http://127.0.0.1:5001/'
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']
+```
+
+#### Example using slack_config
+```/etc/alertmanager/alertmanager.yml
+global:
+  resolve_timeout: 5m
+  slack_api_url: '<SLACK_WEBHOOK>'
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 1h
+  receiver: 'slack'
+receivers:
+  - name: 'slack'
+    slack_configs:
+      - channel: '#testing'
+        send_resolved: true
+        icon_url: 'https://www.usatoday.com/gcdn/authoring/authoring-images/2023/08/25/USAT/70680172007-alertsm.png?crop=2099,1187,x0,y156&width=2099&height=1187&format=pjpg&auto=webp'
+        title: |-
+          [{{ .Status | toUpper}}{{if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} na instância {{ .CommonLabels.instance }}
+        text: >-
+          {{ range .Alerts -}}
+          *Alerta*: {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .labels.severity }}` {{ end }}
+
+          *Descrição*: {{ .Annotations.description }}
+
+          *Detalhes*:
+            {{ range .Labels.SortedPairs}} - *{{ .Name }}*: `{{ .Value }}`
+            {{ end }}
+          {{ end }}  
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+```
+
+#### Verificando os logs da máquina
+```
+journalctl -u alertmanager.service --reverse
+```
+
+
+#### Example using smtp
+```/etc/alertmanager/alertmanager.yml
 global:
   smtp_smarthost: 'mail.example.com:25'
   smtp_from: 'test@example.com'
@@ -856,7 +962,7 @@ receivers:
         text: 'https://exampl.com/alerts/{{ .GroupLabels.app }}/
 ```
 
-```
+```/etc/alertmanager/alertmanager.yml
 route:
   routes:
     # database team.
@@ -907,9 +1013,11 @@ The infra team has alerts grouped based on region and env labels.
 The child routes will inherit the grouping policy and group based on same 2 labels
 
 ### Receivers & Notifiers
+
 Receivers are responsible for taking grouped alerts and producing notifications
 Receivers contain various notifiers, which are responsible for handling the actual notifications
-```
+
+```/etc/alertmanager/alertmanager.yml
 route:
   receiver: infra-pager
 receivers:
@@ -925,11 +1033,14 @@ receivers:
         auth_identity: "ervil2008@gmail.com"
         auth_password: "password"
 ```
-- https://prometheus.io/docs/alerting/latest/configura
+
+#### [Configuration](https://prometheus.io/docs/alerting/latest/configuration/)
 
 #### Global Config
+
 Certain notifier configs/settings will be the same across all receivers and can be moved to global config section
-```
+
+```/etc/alertmanager/alertmanager.yml
 global:
 victorops_api_key: XXX
 receivers:
@@ -938,7 +1049,7 @@ victorops_configs:
 - routing_key: some-route
 ```
 
-```
+```/etc/alertmanager/alertmanager.yml
 global:
 smtp_smarthost: 'smtp.gmail.com:587'
 smtp_from: 'alertmanager@kodekloud.com'
@@ -973,7 +1084,7 @@ Alerts –  List of all the alerts in the notification
           StartsAt – When the alert started firing
           EndsAt – When the alert has stopped firing
 
-```alertmanager.yml
+```/etc/alertmanager/alertmanager.yml
 route:
   receiver: 'slack'
 receivers:
@@ -984,7 +1095,7 @@ receivers:
         title: '{{.GroupLabels.severity}} alerts in region {{.GroupLabels.region}}'
 ```
 
-```alertmanager.yml
+```/etc/alertmanager/alertmanager.yml
 route:
   receiver: 'slack'
 receivers:
@@ -1080,13 +1191,15 @@ receivers:
 
 ### Operator
 - https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+- https://github.com/prometheus-operator/prometheus-operator
 - https://github.com/prometheus-operator/kube-prometheus
   - Alert Manager
   - Prometheus Rule
   - Alertmanager Config
   - Service Monitor
   - Pod Monitor
-
+  - Node Exporter
+  
 ### How to install
 - https://helm.sh/docs/intro/install/
 ```
@@ -1226,6 +1339,362 @@ helm upgrade \
   prometheus prometheus-community/kube-prometheus-stack \
   -f values.yaml
 ```    
+
+### [Using kube-prometheus Operator](https://github.com/prometheus-operator/kube-prometheus)
+
+#### Download and Install
+```
+git clone https://github.com/prometheus-operator/kube-prometheus
+
+cd kube-prometheus
+
+kubectl apply --server-side -f manifests/setup
+
+kubectl wait \
+	--for condition=Established \
+	--all CustomResourceDefinition \
+	--namespace=monitoring
+
+kubectl apply -f manifests/
+
+cd ../
+
+rm -rf kube-prometheus
+
+kubectl get pods -n monitoring
+
+kubectl get svc -n monitoring
+kubectl port-forward --address 0.0.0.0 svc/prometheus-k8s 9090:9090 -n monitoring
+kubectl port-forward --address 0.0.0.0 svc/grafana 3000:3000 -n monitoring
+kubectl port-forward --address 0.0.0.0 svc/alertmanager-main 9093:9093 -n monitoring
+```
+
+#### Service Monitor
+```
+kubectl get servicemonitors grafana -n monitoring -o yaml
+kubectl get servicemonitors prometheus-k8s -n monitoring -o yaml
+```
+
+```service-monitors-grafana.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"monitoring.coreos.com/v1","kind":"ServiceMonitor","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"grafana","app.kubernetes.io/name":"grafana","app.kubernetes.io/part-of":"kube-prometheus","app.kubernetes.io/version":"11.2.1"},"name":"grafana","namespace":"monitoring"},"spec":{"endpoints":[{"interval":"15s","port":"http"}],"selector":{"matchLabels":{"app.kubernetes.io/name":"grafana"}}}}
+  creationTimestamp: "2024-10-12T12:06:22Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 11.2.1
+  name: grafana
+  namespace: monitoring
+  resourceVersion: "12014"
+  uid: c446f3f4-df00-4a7a-b0ec-534c65fef154
+spec:
+  endpoints:
+  - interval: 15s
+    port: http
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+```
+
+#### Create Deployment, ConfigMap and Service
+
+```nginx-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+
+        location / {
+          root /usr/share/nginx/html;
+          index index.html index.htm;
+        }
+
+        location /metrics {
+          stub_status on;
+          access_log off;
+        }
+    }
+```
+
+```nginx-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9113'
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+        agentpool: linuxagent1
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: 0.25
+            requests:
+              memory: 128Mi
+              cpu: 0.25              
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/default.conf
+              name: nginx-config
+              subPath: nginx.conf
+        - name: nginx-exporter
+          image: nginx/nginx-prometheus-exporter
+          args:
+            - '-nginx.scrape-uri=http://localhost/metrics'
+          ports:
+            - containerPort: 9113
+              name: metrics
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: 0.25
+            requests:
+              memory: 128Mi
+              cpu: 0.25              
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: nginx-config
+          name: nginx-config
+```
+
+```nginx-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  labels:
+    app: nginx
+spec:
+  ports:
+    - port: 9113
+      name: metrics
+  selector:
+    app: nginx
+```
+
+```
+kubectl port-forward --address 0.0.0.0 svc/nginx-service 9113:9113
+```
+
+#### Create ServiceMonitor
+```nginx-servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nginx-servicemonitor
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  endpoints:
+    - interval: 10s
+      path: /metrics
+      targetPort: 9113
+```
+
+#### Create PodMonitor
+```nginx-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: nginx
+  name: nginx-pod
+spec:
+  nodeSelector:
+    kubernetes.io/os: linux
+    agentpool: linuxagent1    
+  containers:
+  - image: nginx
+    name: nginx
+    ports:
+      - containerPort: 80
+        name: http
+    resources:
+      limits:
+        memory: 128Mi
+        cpu: 0.25
+      requests:
+        memory: 128Mi
+        cpu: 0.25              
+    volumeMounts:
+      - mountPath: /etc/nginx/conf.d/default.conf
+        name: nginx-config
+        subPath: nginx.conf
+  - name: nginx-exporter
+    image: nginx/nginx-prometheus-exporter
+    args:
+      - '-nginx.scrape-uri=http://localhost/metrics'
+    ports:
+      - containerPort: 9113
+        name: metrics
+    resources:
+      limits:
+        memory: 128Mi
+        cpu: 0.25
+      requests:
+        memory: 128Mi
+        cpu: 0.25              
+  volumes:
+    - configMap:
+        defaultMode: 420
+        name: nginx-config
+      name: nginx-config            
+
+```
+
+```nginx-podmonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: nginx-podmonitor
+  labels:
+    app: nginx
+spec:
+  namespaceSelector:
+    matchNames:
+      - default
+  selector:
+    matchLabels:
+      app: nginx
+  podMetricsEndpoints:
+    - interval: 10s
+      path: /metrics
+      targetPort: 9113
+```
+
+#### Prometheus Rules
+```nginx-prometheusrule.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: nginx-prometheus-rule
+  namespace: monitoring
+  labels:
+    prometheus: k8s
+    role: alert-rules
+    app.kubernetes.io/name: kube-prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+spec:
+  groups:
+    - name: nginx-prometheus-rule
+      rules:
+        - alert: NginxDown
+          expr: nginx_up == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Nginx está fora"
+            description: "O nosso servidor web Nginx está fora {{ .Labels.instance }}!"
+```
+
+O que podemos saber sobre os nodes do nosso cluster?
+Algumas métricas que podemos extrair sobre os nodes do nosso cluster são:
+
+- Quantos nós temos no nosso cluster?
+- Qual a quantidade de CPU e memória que cada nó tem?
+- O nó está disponível para receber novos pods?
+- Qual a quantidade de informação que cada nó está recebendo e enviando?
+- Quantos pods estão rodando em cada nó?
+- Vamos responder essas quatro perguntas utilizando o PromQL e as métricas que estamos coletando do nosso cluster Kubernetes.
+
+Quantos nós temos no nosso cluster?
+Para responder essa pergunta, vamos utilizar a métrica kube_node_info que nos mostra informações sobre os nós do nosso cluster. Podemos utilizar a função count para contar quantas vezes a métrica kube_node_info aparece no nosso cluster.
+```
+count(kube_node_info)
+```
+No nosso cluster, temos 2 nós, então a resposta para essa pergunta é 2.
+
+Qual a quantidade de CPU e memória que cada nó tem?
+Para responder essa pergunta, vamos utilizar a métrica kube_node_status_allocatable que nos mostra a quantidade de CPU e memória que cada nó tem disponível para ser utilizado.
+```
+kube_node_status_allocatable
+```
+Aqui ele vai te trazer todas as informações sobre CPU, memória, pods, etc. Mas nós só queremos saber sobre CPU e memória, então vamos filtrar a nossa consulta para trazer apenas essas informações.
+```
+kube_node_status_allocatable{resource="cpu"}
+kube_node_status_allocatable{resource="memory"}
+```
+Fácil, agora precisamos somente de um pouco de matemática para converter os valores referente a memória para gigabytes.
+```
+kube_node_status_allocatable{resource="memory"} / 1024 / 1024 / 1024
+```
+Pronto, agora ficou um pouco mais fácil de ler a quantidade de memória que temos em cada nó.
+
+O nó está disponível para receber novos pods?
+Para responder essa pergunta, vamos utilizar a métrica kube_node_status_condition que nos mostra o status de cada nó do nosso cluster.
+```
+kube_node_status_condition{condition="Ready", status="true"}
+```
+Com a consulta acima, estamos perguntando para métrica kube_node_status_condition se o nó está pronto para receber novos pods. Se o nó estiver pronto, ele vai retornar o valor 1, caso contrário, ele vai retornar o valor 0.
+
+Isso porque estamos perguntando para a métrica kube_node_status_condition se o nó está com a condição Ready e se o status dessa condição é true, se mudassemos o status para false, ele iria retornar o valor 0. Simplão demais!
+
+Qual a quantidade de informação que cada nó está recebendo e enviando?
+Aqui vamos levar em consideração que estamos falando de trafego de rede, o quanto o nosso nó está recebendo e enviando de dados pela rede.
+
+Para isso vamos utilizar a métrica node_network_receive_bytes_total e node_network_transmit_bytes_total que nos mostra a quantidade de bytes que o nó está recebendo e enviando.
+```
+node_network_receive_bytes_total
+node_network_transmit_bytes_total
+```
+Perceba que a saída dessa consulta ela traz a quantidade de bytes por pod, mas nós queremos saber a quantidade de bytes por nó, então vamos utilizar a função sum para somar a quantidade de bytes que cada pod está recebendo e enviando.
+```
+sum by (instance) (node_network_receive_bytes_total)
+sum by (instance) (node_network_transmit_bytes_total)
+```
+Pronto, dessa forma teriamos a quantidade de bytes que cada nó está recebendo e enviando. No meu caso, como somente tenho dois nodes, o resultado foram duas linhas, uma para cada nó, mostrando a quantidade de bytes que cada nó está recebendo e enviando.
+
+Agora vamos converter esses bytes para megabytes, para ficar mais fácil de ler.
+```
+sum by (instance) (node_network_receive_bytes_total) / 1024 / 1024
+sum by (instance) (node_network_transmit_bytes_total) / 1024 / 1024
+```
+Vamos para a próxima pergunta.
+
+Quantos pods estão rodando em cada nó?
+Para responder essa pergunta, vamos utilizar a métrica kube_pod_info que nos mostra informações sobre os pods que estão rodando no nosso cluster.
+```
+kube_pod_info
+```
+Caso eu queria saber o número de pods que estão rodando em cada nó, eu poderia utilizar a função count para contar quantas vezes a métrica kube_pod_info aparece em cada nó.
+```
+count by (node) (kube_pod_info)
+```
+Pronto, agora eu sei quantos pods estão rodando em cada nó. No meu caso o meu cluster está bem sussa, somente 9 pods em um nó e 10 no outro, um dia de alegriaaaaa!
+
+
+
 ## Anothers Tips and Tricks
 
 ```
