@@ -1,0 +1,56 @@
+Resources:
+  NovoVPC:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: 10.100.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags: 
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-VPC
+
+  NovoInternetGateway:        
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      DependsOn: NovoVPC
+
+  NovoAttachmentGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      VpcId: !Ref NovoVPC
+      InternetGatewayId: !Ref NovoInternetGateway
+      VpnGatewayId: String
+
+  NovaSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: 10.100.1.0/24
+      VpcId: !Ref NovoVPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags: 
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Publica
+      
+  NovaSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: 10.100.10.0/24
+      VpcId: !Ref NovoVPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags: 
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-Privada
+
+  NatGatewayElasticIp:
+    Type: AWS::EC2::EIP
+    Properties: 
+      Domain: NovoVPC
+
+  NovoNATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt NatGatewayElasticIp.AllocationId      
+      SubnetId: !Ref NovaSubnet1
+      Tags: 
+        - Key: Name
+          Value: !Join ['', ["NAT-", !Ref "AWS::StackName"]]

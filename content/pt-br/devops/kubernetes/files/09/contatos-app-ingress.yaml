@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: "2024-02-11T15:04:30Z"
+  generation: 1
+  name: contatos-app
+  namespace: default
+  resourceVersion: "381266"
+  uid: 37a95bc4-7a04-4b33-9ad0-0bcdcec74e4a
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: contatos-app.localhost
+    http:
+      paths:
+      - backend:
+          service:
+            name: contatos-app
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - ip: 192.168.59.110
