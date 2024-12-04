@@ -28,6 +28,7 @@ Métodos de acesso:
 az config set core.allow_broker=true
 az account clear
 az login --use-device-code
+az account set --subscription <SUBSCRIPTION_ID>
 az resource list
 ```
 
