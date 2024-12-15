@@ -314,7 +314,7 @@ etcdctl --version
 > as informações dos certificados devem ser do master node "kubectl describe pod -n kube-system etcd-kumabes-k8s-cluster-control-plane"
 ```
 ETCDCTL_API=3 etcdctl \
-    --endpoints=https://[172.18.0.3]:2379 \
+    --endpoints=https://[172.18.0.5]:2379 \
     --cacert=/etc/kubernetes/pki/etcd/ca.crt \
     --cert=/etc/kubernetes/pki/etcd/server.crt \
     --key=/etc/kubernetes/pki/etcd/server.key \

@@ -4,6 +4,9 @@ alias k="kubectl"
 alias kaf="kubectl apply -f"
 alias ll="ls -lrth --color"
 export do="--dry-run=client -o yaml"
+
+kubectl get pods -o json | jq -c "paths"
+kubectl explain pod.spec.containers --recursive
 ```
 
 

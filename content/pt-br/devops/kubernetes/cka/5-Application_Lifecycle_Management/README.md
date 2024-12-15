@@ -51,3 +51,15 @@ CMD ["5"]
 ```rewritter entrypoint
 docker run --entrypoint sleep2.0 ubuntu-sleepr 10
 ```
+
+
+## Encrypting Secret Data at Rest
+```
+apt update -y && apt install -y etcd-client bsdmainutils
+
+ETCDCTL_API=3 etcdctl \
+    --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+    --cert=/etc/kubernetes/pki/etcd/server.crt \
+    --key=/etc/kubernetes/pki/etcd/server.key \
+    get /registry/secrets/default/my-secrets | hexdump -C
+```    
