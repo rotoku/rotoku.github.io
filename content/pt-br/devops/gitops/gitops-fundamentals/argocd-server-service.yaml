@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: argocd-server-service
+  name: argocd-server-service
+  namespace: argocd
+spec:
+  ports:
+  - name: 80-80
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/name: argocd-server
+  type: NodePort
+status:
+  loadBalancer: {}
