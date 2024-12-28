@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: blue-deploy
+  name: blue-deploy
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      case: bluegreen
+      tier: frontend
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        case: bluegreen
+        tier: frontend
+    spec:
+      containers:
+      - image: httpd:2.4-alpine
+        name: httpd
+        ports:
+          - containerPort: 80
+status: {}

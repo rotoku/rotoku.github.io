@@ -1,0 +1,205 @@
+---
+# Create namespace frontend
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: frontend
+spec: {}
+status: {}
+---
+# Create namespace backend
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backend
+spec: {}
+status: {}
+---
+# Create secret backend
+apiVersion: v1
+data:
+  DB_USERNAME: Y2FzZS0wMDE=
+  DB_PASSWORD: c3VwZXJzZWNyZXQ=
+  DB_NAME: Y2FzZS0wMDE=
+  DB_HOSTNAME: ZGItbWFyaWFkYi1zZXJ2aWNlLmRhdGFiYXNlLnN2Yy5jbHVzdGVyLmxvY2Fs
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: be-products-secret
+  namespace: backend
+---
+# Create deploy backend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: be-products-deploy
+  name: be-products-deploy
+  namespace: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: be-products-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: be-products-deploy
+    spec:
+      containers:
+      - name: products
+        image: rotoku/case-001-backend:v0.0.1
+        ports:
+        - containerPort: 5000
+        env:       
+        - name: "DB_USERNAME"
+          valueFrom:
+            secretKeyRef:
+              key: DB_USERNAME
+              name: be-products-secret
+        - name: "DB_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              key: DB_PASSWORD
+              name: be-products-secret          
+        - name: "DB_NAME"
+          valueFrom:
+            secretKeyRef:
+              key: DB_NAME
+              name: be-products-secret          
+        - name: "DB_HOSTNAME"
+          valueFrom:
+            secretKeyRef:
+              key: DB_HOSTNAME
+              name: be-products-secret
+---
+# Create service backend
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: be-products-service
+  name: be-products-service
+  namespace: backend
+spec:
+  ports:
+  - name: 5000-5000
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: be-products-deploy
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+# Create namespace database
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: database
+spec: {}
+status: {}
+---
+# Create secrets database
+apiVersion: v1
+data:
+  db_root_password: cm9vdA==
+  db_password: c3VwZXJzZWNyZXQ=
+  db_username: Y2FzZS0wMDE=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: db-mariadb-secret
+  namespace: database
+---
+# Create configmap database
+apiVersion: v1
+data:
+  db_name: case-001
+  db_timezone: America/Sao_Paulo
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: db-mariadb-configmap
+  namespace: database
+---
+# Create deployment database
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: db-mariadb-deploy
+  name: db-mariadb-deploy
+  namespace: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-mariadb-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: db-mariadb-deploy
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb:11.6
+        ports:
+        - containerPort: 3306
+        env:
+        - name: "MARIADB_ROOT_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              key: db_root_password
+              name: db-mariadb-secret
+        - name: "MARIADB_DATABASE"
+          valueFrom:
+            configMapKeyRef:
+              key: db_name
+              name: db-mariadb-configmap
+        - name: "TZ"
+          valueFrom:
+            configMapKeyRef:
+              key: db_timezone
+              name: db-mariadb-configmap
+        - name: "MARIADB_USER"
+          valueFrom:
+            secretKeyRef:
+              key: db_username
+              name: db-mariadb-secret
+        - name: "MARIADB_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              key: db_password
+              name: db-mariadb-secret
+status: {}
+---
+# Create service (clusterip) database
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: db-mariadb-service
+  name: db-mariadb-service
+  namespace: database
+spec:
+  ports:
+  - name: 3306-3306
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: db-mariadb-deploy
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---

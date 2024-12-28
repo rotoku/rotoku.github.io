@@ -147,15 +147,13 @@ kubectl version --client --short
 curl -fsSL https://get.docker.com | bash
 ```
 
-#### kind
+#### [kind](https://kind.sigs.k8s.io/docs/user/quick-start/)
 
 ```
-https://kind.sigs.k8s.io/docs/user/quick-start/
-
 # For AMD64 / x86_64
-[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.25.0/kind-linux-amd64
 # For ARM64
-[ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-arm64
+[ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.25.0/kind-linux-arm64
 chmod +x ./kind
 sudo mv ./kind /usr/local/bin/kind
 ```
@@ -884,3 +882,35 @@ alias kdn="kubectl delete namespaces"
 ## 1.29
 
 ## 1.30
+
+## 1.31
+
+## Tips and Tricks
+```~/.vimrc
+set expandtab
+set tabstop=2
+set shiftwidth=2
+``` 
+
+```Log locations to check:
+/var/log/pods
+/var/log/containers
+crictl ps + crictl logs
+docker ps + docker logs (in case when Docker is used)
+kubelet logs: /var/log/syslog or journalctl
+```
+
+```tmux
+## debian and ubuntu
+apt install tmux
+
+## macos
+brew install tmux
+
+## How to use
+tmux
+
+tmux new -s <session_name>
+
+tmux new -s cka
+```
