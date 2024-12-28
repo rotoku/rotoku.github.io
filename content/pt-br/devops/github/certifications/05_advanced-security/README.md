@@ -60,10 +60,38 @@ graph TD;
 - Who is notified?
 - Where are the notifications visible?
 
-## 
+## Automatic Security Updates
+- Dependabot functionality
+- Builds on software composition analysis
+- Immediate Pull Requests after vulnerability disclosure
 
-## 
+## Check New Dependencies
+- Dependency review on a Pull Requests
+- Fail on new vulnerable dependency
 
-## 
+## GitHub Advisory Database
+- Vulnerabilities are added from the following sources:
+    - the national vulnerability database (NIST)
+    - a combination of machine learning and human reviews to detect vulnerabilities in public commits on GitHub
+    - Security Advisories reported on GitHub
+    - The npm Security Advisories database
+- Supported ecosystems:
+    - composer
+    - go
+    - maven
+    - npm
+    - nuget
+    - pip
+    - ruby gems
+    - rust
 
-## 
+1. GitHub Reviewed Advisories
+    - Mapped to track dependencies from the dependency graph
+    - Will generate an alert
+
+2. Unreview Advisories:
+    - Directly added from the national vulnerability database (NIST)
+    - Will not generate an alert
+    - Limitations:
+        - ecosystems:
+            - vulnerability alerts not supported for that ecosystems    
