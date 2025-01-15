@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: exemplo-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            path: /httpd
+            backend:              
+              service:
+                name: httpd
+                port:
+                  number: 8081
+          - pathType: Prefix
+            path: /nginx
+            backend:              
+              service:
+                name: nginx
+                port:
+                  number: 8082

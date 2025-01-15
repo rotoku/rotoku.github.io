@@ -1,0 +1,11 @@
+{
+ "fulano":{
+    "sexo": "masculino"
+ },
+ "siclano":{
+    "sexo": "masculino"
+ },
+ "xuxa":{
+    "sexo": "feminino"
+ }
+}
