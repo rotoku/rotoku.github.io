@@ -7,6 +7,12 @@ weight: 2
 
 # CKAD - Certified Kubernetes Application Developer
 
+## Exporting built container images in OCI format
+```
+docker image save -o alpine-lister-oci.tar alpine-lister:1.0.0
+```
+
+
 ## 1. Introduction (17 minutes)
 
 ## 2. Core Concepts (2 hours 20 minutes)
