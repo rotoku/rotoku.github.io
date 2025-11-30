@@ -1,3 +1,14 @@
+---
+title: "CNPA"
+linkTitle: "CNPA"
+date: 2025-11-30
+weight: 16
+---
+
+---------------
+---------------
+---------------
+
 # CNPA
 
 Para obter a certificação Certified Cloud Native Platform Engineering Associate (CNPA), é fundamental dominar os conceitos e práticas que formam a base da engenharia de plataformas nativas da nuvem. A seguir, apresento um guia de estudos estruturado com base nos domínios e competências da certificação, incluindo referências para aprofundamento.

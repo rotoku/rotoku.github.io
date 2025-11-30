@@ -1,3 +1,14 @@
+---
+title: "Backstage"
+linkTitle: "Backstage"
+date: 2025-11-30
+weight: 17
+---
+
+---------------
+---------------
+---------------
+
 # Backstage
 
 O framework de código aberto líder para a criação de portais para desenvolvedores, abordando a arquitetura e os recursos (Catalog, Scaffolder, TechDocs e Plugins).
