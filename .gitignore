@@ -1,0 +1,13 @@
+# Hugo
+/public
+/resources/_gen/
+hugo_stats.json
+
+# generic
+.DS_Store
+notes*
+
+# node
+**/node_modules/
+
+./senhas/orkut.txt

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: root-user
+spec:
+  hostPID: true
+  hostIPC: true
+  hostUsers: true
+  hostNetwork: true
+  containers:
+    - name: nginx
+      image: nginx:1.14.2
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - mountPath: /host
+          name: noderoot
+  volumes:
+    - name: noderoot
+      hostPath:
+        path: /

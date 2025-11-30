@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: global-alert-manager-configuration
+  namespace: monitoring
+  labels:
+    release: kube-prometheus
+spec:
+  receivers:
+    - name: slack-receiver
+      slackConfigs:
+        - channel: "#alerts" # your channel name that you have created
+          sendResolved: true
+          iconEmoji: ":bell:"
+          text: "<!channel> \nsummary: {{ .CommonAnnotations.summary }}\ndescription: {{ .CommonAnnotations.description }}\nmessage: {{ .CommonAnnotations.message }}"
+  route:
+    matchers:
+      - name: app
+        value: nginx
+        matchType: =
+      - name: alertname
+        value: MinimumRequired
+        matchType: =
+      - name: severity
+        value: warning
+        matchType: =
+    groupBy: ["alertname", "app", "severity"]
+    groupWait: 30s
+    receiver: slack-receiver
+    groupInterval: 1m
+    repeatInterval: 1m

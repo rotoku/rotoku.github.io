@@ -1,0 +1,10 @@
+{
+    "car": {
+        "color": "blue",
+        "price": 20000
+    },
+    "bus": {
+        "color": "white",
+        "price": 120000
+    }
+}

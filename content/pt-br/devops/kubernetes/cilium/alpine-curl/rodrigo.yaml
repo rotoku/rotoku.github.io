@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: rodrigo
+    lastName: kumabe
+  name: rodrigo
+spec:
+  restartPolicy: Never
+  containers:
+  - image: rotoku/alpine-curl:v1.0.0
+    name: rodrigo    
+    args:
+    - "-s"
+    - "https://kumabe.com.br"

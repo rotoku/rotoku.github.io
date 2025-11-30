@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service-clusterip
+spec:
+  type: ClusterIP
+  ports:
+    - targetPort: 80 # assume the same port as the port
+      port: 80 # required
+  selector:
+    app: myapp
+    type: backend

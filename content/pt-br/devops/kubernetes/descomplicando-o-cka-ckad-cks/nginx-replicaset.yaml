@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-replicaset
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-replicaset
+  template:
+    metadata:
+      labels:
+        app: nginx-replicaset
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+        - name: nginx
+          image: nginx
+          env:
+            - name: JAVA_HOME
+              value: /opt/java17/bin

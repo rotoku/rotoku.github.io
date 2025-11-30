@@ -1,0 +1,29 @@
+metadata:
+  creationTimestamp: "2025-02-23T17:50:26Z"
+  generation: 3
+  managedFields:
+  - apiVersion: argoproj.io/v1alpha1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:spec:
+        .: {}
+        f:description: {}
+        f:destinations: {}
+        f:sourceRepos: {}
+      f:status: {}
+    manager: argocd-server
+    operation: Update
+    time: "2025-02-23T17:52:46Z"
+  name: lamiso
+  namespace: argocd
+  resourceVersion: "538890"
+  uid: 7b894580-8d95-4013-9359-75fb59eb606d
+spec:
+  description: Enterprise Development Platform
+  destinations:
+  - name: in-cluster
+    namespace: '*'
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - https://github.com/kumabes-org/lamiso
+status: {}

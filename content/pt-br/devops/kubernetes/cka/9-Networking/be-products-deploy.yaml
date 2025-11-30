@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: be-products-deploy
+  name: be-products-deploy
+  namespace: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: be-products-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: be-products-deploy
+    spec:
+      containers:
+      - name: products
+        image: rotoku/case-001-backend:v0.0.1
+        ports:
+        - containerPort: 5000
+        env:       
+        - name: "DB_USERNAME"
+          valueFrom:
+            secretKeyRef:
+              key: DB_USERNAME
+              name: be-products-secret
+        - name: "DB_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              key: DB_PASSWORD
+              name: be-products-secret          
+        - name: "DB_NAME"
+          valueFrom:
+            secretKeyRef:
+              key: DB_NAME
+              name: be-products-secret          
+        - name: "DB_HOSTNAME"
+          valueFrom:
+            secretKeyRef:
+              key: DB_HOSTNAME
+              name: be-products-secret

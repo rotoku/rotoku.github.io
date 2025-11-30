@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonar
+  labels:
+    app: sonar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonar
+  template:
+    metadata:
+      labels:        
+        app: sonar
+    spec:
+      initContainers:
+      - name: init
+        image: busybox
+        command:
+        - sysctl
+        - -w
+        - vm.max_map_count=262144
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true    
+      containers:
+        - name: sonarqube
+          image: sonarqube
+          ports:
+            - containerPort: 9000
+          env:
+            - name: SONAR_JDBC_URL
+              value: "jdbc:postgresql://postgres:5432/sonarqube"
+            - name: SONAR_JDBC_USERNAME
+              value: "sonarqube"
+            - name: SONAR_JDBC_PASSWORD
+              value: "sonarqube"
+            - name: TZ
+              value: "America/Sao_Paulo"

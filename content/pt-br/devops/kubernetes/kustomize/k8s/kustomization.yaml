@@ -1,0 +1,7 @@
+# kubernetes resources to be managed by kustomize
+resources:
+  - nginx-deploy.yaml
+  - nginx-service.yaml
+# Customizations that need to be made
+commonLabels:
+  company: kumabes-org

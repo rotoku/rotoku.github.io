@@ -1,0 +1,38 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: nginx-prometheus-rule
+  namespace: monitoring
+  labels:
+    release: kube-prometheus
+spec:
+  groups:
+    - name: nginx-prometheus-rule
+      rules:
+        - alert: MinimumRequired
+          for: 1m
+          expr: sum(nginx_up{container="nginx-exporter"}) < 3
+          labels:
+            severity: warning
+            app: nginx
+          annotations:
+            # these annotations are going to be used in the alert that will be send to the slack/email/etc...
+            message: The deployment has less than 3 pod running.
+            summary: the current deployment "nginx-deployment" need to have at least 3 replicas running
+            description: there seems to be a mismatch in the number of pod replicas between your alert configuration and the pod replicas
+        - alert: NginxDown
+          expr: nginx_up == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Nginx está fora"
+            description: "O nosso servidor web Nginx está fora {{ .Labels.instance }}!"
+        - alert: NginxHighRequestRate # Nome do alerta
+          expr: rate(nginx_http_requests_total{job="nginx-service"}[5m]) > 10 # Expressão que será utilizada para disparar o alerta
+          for: 1m # Tempo que a expressão deve ser verdadeira para que o alerta seja disparado
+          labels: # Labels do alerta
+            severity: warning # Label que indica a severidade do alerta
+          annotations: # Anotações do alerta
+            summary: "Nginx is receiving high request rate" # Título do alerta
+            description: "Nginx is receiving high request rate for more than 1 minute. Pod name: {{ $labels.pod }}" # Descrição do alerta            

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: java-webapp
+    tier: frontend
+  name: java-webapp-deployment
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: java-webapp
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: java-webapp
+        tier: frontend
+    spec:
+      containers:
+      - image: rotoku/java-webapp:latest
+        name: java-webapp

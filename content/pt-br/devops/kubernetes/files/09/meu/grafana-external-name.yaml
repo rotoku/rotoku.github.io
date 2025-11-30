@@ -1,0 +1,7 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: grafana
+spec:
+  type: ExternalName
+  externalName: grafana.monitoring.svc.cluster.local

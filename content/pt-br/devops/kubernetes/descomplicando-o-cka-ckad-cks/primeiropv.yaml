@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: primeiropv
+spec:
+  storageClassName: "" 
+  persistentVolumeReclaimPolicy: Retain # [Retain | Recycle | Delete]
+    # Retain -- Precisa de uma ação manual
+    # Recycle -- Basico (rm -rf /thevolume/*)
+    # Delete -- utilizando AWS EBS, GCE PD, Azure Disk, ou OpenStack Cinder o volume é deletado
+  volumeMode: Filesystem # [Filesystem | Block]
+  capacity:
+    storage: 10Gi
+  accessModes: # [ReadWriteOnce | ReadOnlyMany | ReadWriteMany]
+    - ReadWriteOnce
+  hostPath:
+    path: "/volume"
+    type: "" # [ FileOrCreate | DirectoryOrCreate ]
+      # DirectoryOrCreate = Se nada existir no caminho fornecido, um diretório vazio será criado lá conforme necessário com a permissão definida como 0755, tendo o mesmo grupo e propriedade do Kubelet.
+      # FileOrCreate = Se nada existir no caminho fornecido, um arquivo vazio será criado lá conforme necessário com a permissão definida como 0644, tendo o mesmo grupo e propriedade do Kubelet.

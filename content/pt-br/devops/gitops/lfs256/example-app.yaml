@@ -1,0 +1,14 @@
+project: default
+source:
+  repoURL: https://github.com/rotoku/LFS256-code.git
+  path: argocd/example-app
+  targetRevision: HEAD
+destination:
+  server: https://kubernetes.default.svc
+  namespace: default
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+  syncOptions:
+    - CreateNamespace=true

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: green-deploy
+  name: green-deploy
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      case: bluegreen
+      tier: frontend
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        case: bluegreen
+        tier: frontend
+    spec:
+      containers:
+      - image: nginx:alpine
+        name: nginx
+        ports:
+          - containerPort: 80
+status: {}

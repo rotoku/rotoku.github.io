@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: arc-systems
+  namespace: argocd
+spec:
+  destination:
+    namespace: arc-systems
+    server: "https://kubernetes.default.svc"
+  project: default
+  source:
+    chart: "gha-runner-scale-set-controller"
+    repoURL: "ghcr.io/actions/actions-runner-controller-charts"
+    targetRevision: "0.9.3"
+    helm:
+      parameters:
+        - name: "replicaCount"
+          value: "1"      
+        - name: "image.repository"
+          value: "ghcr.io/actions/gha-runner-scale-set-controller"
+        - name: "image.pullPolicy"
+          value: "IfNotPresent"
+        - name: "image.tag"
+          value: "0.9.3"
+        - name: "serviceAccount.create"
+          value: "true"
+        - name: "serviceAccount.name"
+          value: ""
+        - name: "flags.logFormat"
+          value: "json"
+        - name: "flags.logLevel"
+          value: "debug"        
+        - name: "flags.updateStrategy"
+          value: "immediate"                      
+        - name: "resources.limits.cpu"
+          value: "1"
+        - name: "resources.limits.memory"
+          value: "3Gi"          
+        - name: "resources.requests.cpu"
+          value: "1"
+        - name: "resources.requests.memory"
+          value: "3Gi"          
+
+        - name: "metrics.controllerManagerAddr"
+          value: ":8080"
+        - name: "metrics.listenerAddr"
+          value: ":8080"          
+        - name: "metrics.listenerEndpoint"
+          value: "/metrics"          

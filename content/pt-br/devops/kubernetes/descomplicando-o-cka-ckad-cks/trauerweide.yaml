@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  tree: trauerweide
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2024-10-20T22:53:10Z"
+  name: trauerweide
+  namespace: default
+  resourceVersion: "7082"
+  uid: abfb6169-fccb-4235-bd94-b668fcae1a7d

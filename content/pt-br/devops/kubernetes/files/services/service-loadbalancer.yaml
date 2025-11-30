@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: myapp
+    type: backend
+  ports:
+    - targetPort: 80 # assume the same port as the port
+      port: 80 # required
+      nodePort: 30008 # random from 30000 - 32767
